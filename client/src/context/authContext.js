@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { useContext, createContext, useEffect, useState } from "react";
 import AuthService from "../services/account";
 
 export const AuthContext = createContext();
@@ -17,7 +17,7 @@ const AuthProvider = ({children}) => {
     }, []);
 
     return(
-        <div>
+        <>
             {!isLoaded ? (
                 <p>Loading.....</p>
             ) : (
@@ -26,8 +26,10 @@ const AuthProvider = ({children}) => {
                     {children}
                 </AuthContext.Provider>
             )}
-        </div>
+        </>
     )
 }
 
 export default AuthProvider;
+
+export const useAuth = () => useContext(AuthContext);

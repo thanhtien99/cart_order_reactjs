@@ -98,9 +98,20 @@
   height: 1px;
   background: #eee;
 }
+
+.drop_profile .dropdown-item.active{
+  background-color: #fff;
+  color: #000;
+}
+
+.drop_profile .dropdown-item.active:hover{
+  background-color: #a1a1a1;
+}
+
 .h-custom {
   height: calc(100% - 73px);
 }
+
 @media (max-width: 450px) {
   .h-custom {
   height: 100%;

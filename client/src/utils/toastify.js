@@ -1,31 +1,13 @@
 import { toast } from 'react-toastify';
 
 // Success Notification
-export const notifySuccess = (msg) => {
-    return toast.success(msg, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-    });
+export const notifySuccess = (msg, opts={}) => {
+    return toast.success(msg, opts);
 };
 
 // Error Notification
-export const notifyError = (msg) => {
-    return toast.error(msg, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-    });
+export const notifyError = (msg, opts={}) => {
+    return toast.error(msg, opts);
 };
 
 // Custom Notification

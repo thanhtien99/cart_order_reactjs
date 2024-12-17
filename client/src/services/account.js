@@ -40,11 +40,15 @@ const login = async (user) => {
     }
 };
 
+const logout = async () => {
+    const res = await axios.get("/auth/logout");
+    return res.data;
+};
+
 const AuthService = { 
     isAuthenticated: async () => {
         try {
             const res = await axios.get("/auth/authenticated");
-            console.log(res);
             
             if (res.status !== 401) {
                 return res.data;
@@ -58,5 +62,5 @@ const AuthService = {
     }
 };
 
-export { register, login };
+export { register, login, logout };
 export default AuthService;

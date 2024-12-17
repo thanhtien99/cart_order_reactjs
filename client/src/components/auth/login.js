@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/authContext';
 import { login } from '../../services/account';
 import { useNavigate } from "react-router-dom";
-import { notifySuccess, notifyError } from '../../utils/toastify'
+import { notifySuccess, notifyError } from '../../utils/toastify';
 
 function Login() {
     const [user, setUser] = useState({ email: "", password: ""});
@@ -20,14 +20,14 @@ function Login() {
             const data = await login(user);
 
             const { isAuthenticated, user: loggedInUser, message } = data;
-
+            
             if (isAuthenticated) {
                 authContext.setUser(loggedInUser); 
                 authContext.setIsAuthenticated(isAuthenticated); 
                 navigate("/"); 
-                notifySuccess("Login successfully.")
+                notifySuccess("Login successfully.");
             } else {
-                notifyError(message); 
+                notifyError(message.msgBody); 
             }
         } catch (error) {
             notifyError( "An error occurred, please try again."); 
