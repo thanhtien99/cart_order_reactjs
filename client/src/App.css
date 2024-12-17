@@ -112,6 +112,16 @@
   height: calc(100% - 73px);
 }
 
+.btn-buy-custom {
+  width: 100%;
+  background: rgba(241, 248, 254, 1);
+  padding: 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  color: #2a83e9;
+  font-size: 14px;
+}
+
 @media (max-width: 450px) {
   .h-custom {
   height: 100%;

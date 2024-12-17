@@ -60,7 +60,7 @@ function Register(props) {
             <div className="row d-flex justify-content-center align-items-center h-100">
             <div className="col-md-9 col-lg-6 col-xl-5">
                 <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-                className="img-fluid" alt="Sample image" />
+                className="img-fluid" alt="Illustration of a user interacting with a login form" />
             </div>
             <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                 <form onSubmit={onSubmit}>
@@ -70,7 +70,7 @@ function Register(props) {
                     </div>
 
                     <div data-mdb-input-init className="form-outline mb-4">
-                        <input type="email" name="email" id="form3Example3" className="form-control form-control-lg"
+                        <input type="email" name="email" id="form3Example1" className="form-control form-control-lg"
                         placeholder="Email" 
                         value={user.email}
                         onChange={onChange}/>
@@ -78,7 +78,7 @@ function Register(props) {
                     </div>
 
                     <div data-mdb-input-init className="form-outline mb-4">
-                        <input type="text" name="username" id="form3Example3" className="form-control form-control-lg"
+                        <input type="text" name="username" id="form3Example2" className="form-control form-control-lg"
                         placeholder="Tên người dùng" 
                         value={user.username}
                         onChange={onChange}/>
@@ -94,7 +94,7 @@ function Register(props) {
                     </div>
 
                     <div data-mdb-input-init className="form-outline mb-4">
-                        <input type="text" name="address" id="form3Example3" className="form-control form-control-lg"
+                        <input type="text" name="address" id="form3Example4" className="form-control form-control-lg"
                         placeholder="Địa chỉ"
                         value={user.address}
                         onChange={onChange} />
@@ -102,7 +102,7 @@ function Register(props) {
                     </div>
 
                     <div data-mdb-input-init className="form-outline mb-3">
-                        <input type="password" name="password" id="form3Example4" className="form-control form-control-lg"
+                        <input type="password" name="password" id="form3Example5" className="form-control form-control-lg"
                         placeholder="Mật khẩu"
                         value={user.password}
                         onChange={onChange} />
@@ -110,7 +110,7 @@ function Register(props) {
                     </div>
 
                     <div data-mdb-input-init className="form-outline mb-3">
-                        <input type="password" name="passwordConfig" id="form3Example4" className="form-control form-control-lg"
+                        <input type="password" name="passwordConfig" id="form3Example6" className="form-control form-control-lg"
                         placeholder="Nhập lại mật khẩu"
                         value={user.passwordConfig}
                         onChange={onChange} />
@@ -119,7 +119,7 @@ function Register(props) {
 
                     <div className="text-center text-lg-start mt-4 pt-2">
                         <button  type="submit" data-mdb-button-init data-mdb-ripple-init className="btn btn-warning btn-lg"
-                        style={{"padding-left": "2.5rem", "padding-right": "2.5rem"}}>Đăng ký</button>
+                        style={{"paddingLeft": "2.5rem", "paddingRight": "2.5rem"}}>Đăng ký</button>
                     </div>
                 </form>
             </div>
