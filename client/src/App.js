@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="App">
       <Navbar />
-      <section className="d-flex flex-grow-1 align-items-center justify-content-center">
+      <section className="d-flex flex-grow-1 align-items-center justify-content-center flex-column">
         <PathURL />
       </section>
       <Footer />

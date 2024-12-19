@@ -1,0 +1,23 @@
+.image_card_product{
+    max-height: 203px;
+}
+
+.btn_add_cart {
+    width: 100%;
+    background: rgb(231, 242, 251);
+    padding: 7px;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #2a83e9;
+    font-size: 14px;
+}
+
+.btn_buy {
+    width: 100%;
+    background: #fc7600;
+    padding: 7px;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #fff;
+    font-size: 14px;
+}

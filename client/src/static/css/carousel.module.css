@@ -1,0 +1,9 @@
+.carousel-inner{
+    border-radius: 10px;
+    margin: 20px 0 20px 0;
+}
+
+.carousel-fade{
+    padding-left: 0;
+    padding-right: 0;
+}
