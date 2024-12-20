@@ -3,6 +3,7 @@ import { productList } from "../../services/product";
 import styles from "../../static/css/product.module.css";
 import { AuthContext } from "../../context/authContext";
 import { addCart } from "../../services/cart";
+import { notifySuccess, notifyError } from '../../utils/toastify'
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -25,8 +26,15 @@ function ProductList() {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  const handleAddToCart = (user_id, product, quantity = 1) => {
-    addCart(user_id, product, quantity);
+  const handleAddToCart = async (user_id, product, quantity = 1) => {
+    try {
+      const result = await addCart(user_id, product, quantity);
+      console.log('Cart added successfully:', result);
+      notifySuccess("Cart added successfully");
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      notifyError("Failed to add to cart. Please try again.");
+    }
   };
 
   return (

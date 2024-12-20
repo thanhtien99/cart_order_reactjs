@@ -11,18 +11,15 @@ const addCart = async (user_id, product, quantity = 1) => {
           name: product.name,
           thumbnail: product.thumbnail,
           price: product.price,
-          quantity: quantity,
         },
-        total_product: quantity,
+        quantity: quantity,
         total_price: totalPrice,
     };
     
-    console.log("Zxczxczxcefsrgsdfbxfcvb", cartData);
-    
     const response = await axios.post('/cart/', cartData);
-    console.log('Cart added successfully:', response.data);
+    return response.data; 
   } catch (error) {
-    console.error('Error adding to cart:', error);
+    return error;
   }
 };
 
