@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { productList } from "../../services/product";
 import styles from "../../static/css/product.module.css";
 import { useAuth } from "../../context/authContext";
-import { addCart, addCartToSession } from "../../services/cart";
+import { addCart, addCartToLocalStorage } from "../../services/cart";
 import { notifySuccess, notifyError } from '../../utils/toastify';
 import { useCartContext } from "../../context/addCart";
 
@@ -31,15 +31,13 @@ function ProductList() {
   const handleAddToCart = async (product, quantity = 1) => {
     try {
       if (isAuthenticated){
-        const result = await addCart(user._id, product, quantity);
+        await addCart(user._id, product, quantity);
         setCart((prevCart) => prevCart + quantity);
         notifySuccess("Cart added successfully");
-        console.log('Cart added successfully:', result);
       } else{
-        const result = await addCartToSession(product, quantity);
+        await addCartToLocalStorage(product, quantity);
         setCart((prevCart) => prevCart + quantity);
         notifySuccess("Cart added successfully");
-        console.log('Cart added successfully:', result);
       }
       
     } catch (error) {
@@ -52,7 +50,7 @@ function ProductList() {
     <div className="row">
       {products.length > 0 ? (
         products.map((product) => (
-          <div className="col-md-6 col-lg-3 mb-4 mb-md-0 mt-3">
+          <div className="col-md-6 col-lg-3 mb-4 mb-md-0 mt-3" key={product._id}>
             <div className="card">
               <img
                 src={product.thumbnail}

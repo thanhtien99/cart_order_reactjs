@@ -9,9 +9,6 @@ function Navbar() {
   const navigate = useNavigate();
   const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
   const { cart } = useCartContext();
-  console.log("TOTAL CART", cart);
-  
-  
 
   const onLogout = async () => {
     try {

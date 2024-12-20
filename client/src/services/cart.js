@@ -1,5 +1,6 @@
 import axios from "../utils/api";
-import { setSessionItem, getSessionItem } from "../utils/set_session_storage";
+import { setSessionItem, getSessionItem } from "../utils/sessionStorage";
+import { setLocalStorageItem, getLocalStorageItem } from "../utils/localStorage";
 
 const addCart = async (user_id, product, quantity = 1) => {
   try {
@@ -67,5 +68,35 @@ const addCartToSession = async (product, quantity = 1) => {
   }
 };
 
+const addCartToLocalStorage = async (product, quantity = 1) => {
+  try {
+      const cartData = getLocalStorageItem("cart_local") || [];
+      const existingProductIndex = cartData.findIndex(item => item.product.id === product._id);
+      const totalPrice = product.price * quantity;
 
-export { addCart, getCart, addCartToSession };
+      if (existingProductIndex !== -1) {
+        cartData[existingProductIndex].quantity += quantity;
+        cartData[existingProductIndex].total_price = cartData[existingProductIndex].quantity * product.price;
+      } else {
+          cartData.push({
+            product: {
+              id: product._id,
+              name: product.name,
+              thumbnail: product.thumbnail,
+              price: product.price,
+            },
+            quantity: quantity,
+            total_price: totalPrice,
+          });
+      }
+
+      setLocalStorageItem("cart_local", cartData);
+
+      return cartData;
+  } catch (error) {
+      console.error("Error adding to localStorage:", error);
+      return error;
+  }
+};
+
+export { addCart, getCart, addCartToSession, addCartToLocalStorage };
