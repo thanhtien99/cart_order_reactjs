@@ -119,6 +119,11 @@
   background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))
 }
 
+.badge_card{
+  left: 25px;
+  font-size: 10px;
+}
+
 @media (max-width: 450px) {
   .h-custom {
   height: 100%;

@@ -3,10 +3,15 @@ import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../../context/authContext";
 import { logout } from "../../services/account";
 import { useNavigate } from "react-router-dom";
+import { useCartContext } from "../../context/addCart";
 
 function Navbar() {
-  const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
   const navigate = useNavigate();
+  const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
+  const { cart } = useCartContext();
+  console.log("TOTAL CART", cart);
+  
+  
 
   const onLogout = async () => {
     try {
@@ -23,11 +28,14 @@ function Navbar() {
     return(
       <ul className="navbar-nav">
         <li className="nav-item me-2">
-          <a className="nav-link nav-link-custom" aria-current="page" href="/#">
+          <a className="nav-link nav-link-custom position-relative" aria-current="page" href="/#">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-cart3 me-2" viewBox="0 0 16 16">
                   <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
               </svg>
               Giỏ hàng
+              <span className={`${cart ? "" : "d-none"} position-absolute translate-middle badge rounded-pill bg-danger badge_card`}>
+                {cart ? cart : ''}
+              </span>
           </a>
         </li>
         <li className="nav-item me-2">
@@ -48,11 +56,14 @@ function Navbar() {
     return(
       <ul className="navbar-nav">
         <li className="nav-item me-2">
-          <a className="nav-link nav-link-custom" aria-current="page" href="/#">
+          <a className="nav-link nav-link-custom position-relative" aria-current="page" href="/#">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-cart3 me-2" viewBox="0 0 16 16">
                   <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
               </svg>
               Giỏ hàng
+              <span className={`${cart ? "" : "d-none"} position-absolute translate-middle badge rounded-pill bg-danger badge_card`}>
+                {cart ? cart : ''}
+              </span>
           </a>
         </li>
         <li className="nav-item dropdown">

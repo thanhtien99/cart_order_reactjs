@@ -9,11 +9,19 @@ const AuthProvider = ({children}) => {
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        AuthService.isAuthenticated().then(data =>{
-            setUser(data.user);
-            setIsAuthenticated(data.isAuthenticated);
-            setIsLoaded(true);
-        });
+        const fetchAuthStatus = async () => {
+            try {
+                const data = await AuthService.isAuthenticated();
+                setUser(data.user);
+                setIsAuthenticated(data.isAuthenticated);
+            } catch (error) {
+                console.error("Error fetching authentication status:", error);
+            } finally {
+                setIsLoaded(true);
+            }
+        };
+
+        fetchAuthStatus();
     }, []);
 
     return(

@@ -43,5 +43,26 @@ cartRouter.post('/', async (req, res) => {
   }
 });
 
+cartRouter.get('/', async (req, res) => {
+  try {
+    const { user } = req.query;
+    
+    const existingUser = await User.findById(user);
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const carts = await Cart.find({ user: user });
+    res.status(200).json({
+      success: true,
+      data: carts,
+    });
+
+  } catch (error) {
+    console.error('Error saving cart:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = cartRouter;
