@@ -56,7 +56,7 @@ function ProductList() {
               />
               <div className="card-body">
                 <div className="d-flex mb-3">
-                  <h5 className="mb-0">{product.name}</h5>
+                  <p className="mb-0 fw-bold">{product.name}</p>
                 </div>
 
                 <div className="d-flex">

@@ -25,6 +25,17 @@ const addCart = async (user_id, product, quantity = 1) => {
   }
 };
 
+const updateCart = async (cart_id, quantity) => {
+  try {
+    const response = await axios.put(`/cart/${cart_id}`, { quantity });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating cart:', error);
+    return { error: error.response?.data?.error || 'Unknown error' };
+  }
+};
+
+
 const getCart = async (user) => {
   try {
     const response = await axios.get('/cart', {
@@ -33,6 +44,17 @@ const getCart = async (user) => {
     return response.data; 
   } catch (error) {
     console.error("Error fetching cart count:", error);
+    return { error: error.response?.data?.error || "Unknown error" };
+  }
+};
+
+const deleteCart = async (cart) => {
+  const cart_id = cart._id;
+  try {
+    const response = await axios.delete(`/cart/${cart_id}`);
+    return response.data; 
+  } catch (error) {
+    console.error("Error deleting cart item:", error);
     return { error: error.response?.data?.error || "Unknown error" };
   }
 };
@@ -99,4 +121,4 @@ const addCartToLocalStorage = async (product, quantity = 1) => {
   }
 };
 
-export { addCart, getCart, addCartToSession, addCartToLocalStorage };
+export { addCart, updateCart, getCart, deleteCart, addCartToSession, addCartToLocalStorage };
