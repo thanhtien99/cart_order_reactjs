@@ -57,12 +57,12 @@ const signToken = (userID) => {
 
 userRouter.post("/login", passport.authenticate("local", { session: false }), (req, res) => {
   if (req.isAuthenticated()) {
-    const { _id, email, username } = req.user;
+    const { _id, email, username, phone, address } = req.user;
     const token = signToken(_id);
     res.cookie('access_token', token, { httpOnly: true, sameSite: 'Lax' });
     return res.status(200).json({
       isAuthenticated: true,
-      user: { _id, email, username },
+      user: { _id, email, username, phone, address },
     });
   }
 
@@ -75,7 +75,7 @@ userRouter.post("/login", passport.authenticate("local", { session: false }), (r
 //Logout
 userRouter.get("/logout", passport.authenticate("jwt", { session: false }), (req, res) => {
   res.clearCookie("access_token");
-  res.json({user: {email: "", username: ""}, session: true});
+  res.json({user: {email: "", username: "", phone: "", address: ""}, session: true});
 });
 
 // Check login
@@ -83,7 +83,7 @@ userRouter.get("/authenticated", passport.authenticate("jwt", { session: false }
   const { _id, email } = req.user;
   res.status(200).json({
     isAuthenticated: true,
-    user: { _id, email, username: req.user.username },
+    user: { _id, email, username: req.user.username, phone: req.user.phone, address: req.user.address },
   });
 });
 

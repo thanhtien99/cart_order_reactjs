@@ -5,6 +5,7 @@ import { useAuth } from "../../context/authContext";
 import { addCart, addCartToLocalStorage } from "../../services/cart";
 import { notifySuccess, notifyError } from '../../utils/toastify';
 import { useCartContext } from "../../context/addCart";
+import { formatCurrency } from "../../utils/fomat";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -23,10 +24,6 @@ function ProductList() {
 
     fetchProducts();
   }, []);
-
-  const formatCurrency = (value) => {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
 
   const handleAddToCart = async (product, quantity = 1) => {
     try {

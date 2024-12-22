@@ -6,6 +6,7 @@ import Register from "./auth/register";
 import Profile from "./profile";
 import PrivateRouter from "../protecting_router/private_router";
 import UnPrivateRouter from "../protecting_router/unprivate_router";
+import Cart from "./cart/cart";
 
 function PathURL(props) {
   return (
@@ -35,6 +36,7 @@ function PathURL(props) {
           </PrivateRouter>
         }
       />
+      <Route path="/cart" element={<Cart />} />
     </Routes>
   );
 }

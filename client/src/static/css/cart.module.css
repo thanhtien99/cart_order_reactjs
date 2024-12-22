@@ -1,0 +1,50 @@
+.cart_title_top{
+    color: #000;
+    cursor: pointer;
+}
+
+.cart_body{
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #eee;
+}
+
+.card_user_info{
+    border: 1px solid #0d6efd;
+    background-color: #e4efff;
+}
+
+.no-spinners {
+    height: 28px;
+    width: 28px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-style: solid;
+    --tw-border-opacity: 1;
+    border-color: rgb(231 234 238 / var(--tw-border-opacity));
+    text-align: center;
+    font-weight: bold;
+    --tw-text-opacity: 1;
+    color: rgb(16 24 40 / var(--tw-text-opacity));
+}
+
+.minus_button,
+.plus_button{
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.minus_button:hover,
+.plus_button:hover{
+    background-color: #ededed;
+}
+
+.btn_book_cart{
+    margin: 40px 0 0 0;
+    width: 100%;
+    background: #fc7600;
+    border-radius: 6px;
+    font-weight: 700;
+    color: #fff;
+    font-size: 14px;
+}
