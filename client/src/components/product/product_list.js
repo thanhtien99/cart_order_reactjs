@@ -6,11 +6,13 @@ import { addCart, addCartToLocalStorage } from "../../services/cart";
 import { notifySuccess, notifyError } from '../../utils/toastify';
 import { useCartContext } from "../../context/addCart";
 import { formatCurrency } from "../../utils/fomat";
+import { useNavigate } from "react-router-dom";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const { user, isAuthenticated } = useAuth();
   const { setCart } = useCartContext();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchProducts = async () => {
@@ -35,6 +37,24 @@ function ProductList() {
         await addCartToLocalStorage(product, quantity);
         setCart((prevCart) => prevCart + quantity);
         notifySuccess("Cart added successfully");
+      }
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      notifyError("Failed to add to cart. Please try again.");
+    }
+  };
+
+  const handleBuy = async (product, quantity = 1) => {
+    try {
+      if (isAuthenticated){
+        await addCart(user._id, product, quantity);
+        setCart((prevCart) => prevCart + quantity);
+        navigate("/cart");
+      } else{
+        await addCartToLocalStorage(product, quantity);
+        setCart((prevCart) => prevCart + quantity);
+        navigate("/cart");
       }
       
     } catch (error) {
@@ -90,7 +110,8 @@ function ProductList() {
                     </svg>
                     Thêm vào giỏ
                   </button>
-                  <button type="button" className={`${styles["btn_buy"]} btn`}>
+                  <button type="button" className={`${styles["btn_buy"]} btn`}
+                  onClick={() => handleBuy(product)}>
                     Mua ngay
                   </button>
                 </div>
