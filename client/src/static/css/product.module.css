@@ -1,5 +1,10 @@
 .image_card_product{
     max-height: 203px;
+    cursor: pointer;
+}
+
+.image_card_product:hover .product_name{
+    color: #2a83e9;
 }
 
 .btn_add_cart {
@@ -20,4 +25,13 @@
     font-weight: 700;
     color: #fff;
     font-size: 14px;
+}
+
+.product_name{
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.product_name:hover{
+    color: #2a83e9;
 }

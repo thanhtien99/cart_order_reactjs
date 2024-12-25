@@ -1,13 +1,14 @@
 const express = require('express');
 const cartRouter = express.Router();
-const Cart = require('../models/cart');
+const CartOrder = require("../models/cart_order")
+const CartOrderItem = require("../models/cart_order_item")
 const User = require('../models/users');
 
 cartRouter.post('/', async (req, res) => {
   try {
-    const { user, product, quantity, total_price } = req.body;
+    const { user, product_id, name, thumbnail, quantity, price, total_price } = req.body;
 
-    if (!user || !product || !product.id || quantity <= 0 || !total_price) {
+    if (!user || !product_id || !name || !thumbnail || quantity <= 0 || price <= 0 || total_price <=0 ) {
       return res.status(400).json({ error: 'Missing or invalid required fields' });
     }
 
@@ -16,25 +17,34 @@ cartRouter.post('/', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const cart = await Cart.findOne({ user: user, "product.id" : product.id });
-    
-    if (cart) {
-      cart.quantity += quantity;
-      cart.total_price += total_price;
+    let cartOrder = await CartOrder.findOne({ user, status: 'in_cart' });
+    if (!cartOrder) {
+      cartOrder = new CartOrder({ user });
+      await cartOrder.save();
+    }
 
-      const updatedCart = await cart.save();
-      return res.status(200).json({ message: 'Cart updated successfully', data: updatedCart });
+    const cartItem = await CartOrderItem.findOne({
+      cart_order: cartOrder._id,
+      product: product_id,
+    });
 
+    if (cartItem) {
+      cartItem.quantity += quantity;
+      cartItem.total_price = cartItem.quantity * cartItem.price;
+      await cartItem.save();
+      return res.status(200).json({ message: 'Cart item updated successfully', data: cartItem });
     } else {
-      const newCart = new Cart({
-        user: user,
-        product: product,
-        quantity: quantity,
-        total_price: total_price,
+      const newCartItem = new CartOrderItem({
+        cart_order: cartOrder._id,
+        product: product_id,   
+        name,
+        thumbnail,
+        quantity,
+        price,
+        total_price: price * quantity,
       });
-  
-      const savedCart = await newCart.save();
-      return res.status(201).json({ message: 'Cart created successfully', data: savedCart });
+      await newCartItem.save();
+      return res.status(201).json({ message: 'Cart item added successfully', data: newCartItem });
     }
 
   } catch (error) {
@@ -42,6 +52,7 @@ cartRouter.post('/', async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 cartRouter.put('/:id', async (req, res) => {
   try {
@@ -52,17 +63,16 @@ cartRouter.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Invalid quantity' });
     }
 
-    const cart = await Cart.findById(id);
-
-    if (!cart) {
-      return res.status(404).json({ error: 'Cart not found' });
+    const cartItem = await CartOrderItem.findById(id);
+    if (!cartItem) {
+      return res.status(404).json({ error: 'Cart item not found' });
     }
 
-    cart.quantity = quantity;
-    cart.total_price = cart.product[0].price * quantity;
+    cartItem.quantity = quantity;
+    cartItem.total_price = cartItem.price * quantity;
+    const updatedCartItem = await cartItem.save();
 
-    const updatedCart = await cart.save();
-    return res.status(200).json({ message: 'Cart updated successfully', data: updatedCart });
+    return res.status(200).json({ message: 'Cart updated successfully', data: updatedCartItem });
   } catch (error) {
     console.error('Error updating cart:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -71,21 +81,43 @@ cartRouter.put('/:id', async (req, res) => {
 
 cartRouter.get('/', async (req, res) => {
   try {
-    const { user } = req.query;
-    
+    const { user, status } = req.query;
+
+    if (!user) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
     const existingUser = await User.findById(user);
     if (!existingUser) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const carts = await Cart.find({ user: user });
-    res.status(200).json({
-      success: true,
-      data: carts,
+    const cartOrders = await CartOrder.find({
+      user,
+      status: status,
+    }).populate({
+      path: 'user',
+      select: 'name',
+    });
+    
+
+    if (cartOrders.length === 0) {
+      return res.status(404).json({ error: 'No carts found for the given criteria' });
+    }
+
+    const cartItems = await CartOrderItem.find({
+      cart_order: { $in: cartOrders.map((order) => order._id) },
     });
 
+    return res.status(200).json({
+      success: true,
+      data: {
+        cart_orders: cartOrders,
+        cart_items: cartItems,
+      },
+    });
   } catch (error) {
-    console.error('Error saving cart:', error);
+    console.error('Error fetching cart orders:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -94,8 +126,8 @@ cartRouter.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const cart = await Cart.findByIdAndDelete(id);
-    if (!cart) {
+    const cartItem = await CartOrderItem.findByIdAndDelete(id);
+    if (!cartItem) {
       return res.status(404).json({ error: 'Cart item not found' });
     }
     return res.status(200).json({ message: 'Cart item deleted successfully' });

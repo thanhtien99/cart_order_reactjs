@@ -4,18 +4,14 @@ import { setLocalStorageItem, getLocalStorageItem } from "../utils/localStorage"
 
 const addCart = async (user_id, product, quantity = 1) => {
   try {
-    const totalPrice = product.price * quantity;
-
     const cartData = {
-        user: user_id,
-        product: {
-          id: product._id,
-          name: product.name,
-          thumbnail: product.thumbnail,
-          price: product.price,
-        },
-        quantity: quantity,
-        total_price: totalPrice,
+      user: user_id,
+      product_id: product._id,
+      name: product.name,
+      thumbnail: product.thumbnail,
+      quantity: quantity,
+      price: product.price,
+      total_price: product.price * quantity,
     };
     
     const response = await axios.post('/cart/', cartData);
@@ -36,10 +32,10 @@ const updateCart = async (cart_id, quantity) => {
 };
 
 
-const getCart = async (user) => {
+const getCart = async (user, status) => {
   try {
     const response = await axios.get('/cart', {
-      params: { user: user._id }
+      params: { user: user._id, status }
     });
     return response.data; 
   } catch (error) {

@@ -13,10 +13,12 @@ const AddCartProvider = ({children}) => {
         const fetchCartData = async () => {
             try {
                 if (user && isAuthenticated) {
-                    const data = await getCart(user);
-                    if (data.data && Array.isArray(data.data)) {
-                        const totalQuantity = data.data.reduce((acc, item) => acc + item.quantity, 0);
+                    const response = await getCart(user, "in_cart");
+                    if (response?.data?.cart_items && Array.isArray(response.data.cart_items)) {
+                        const totalQuantity = response.data.cart_items.reduce((acc, item) => acc + item.quantity, 0);
                         setCart(totalQuantity);
+                    } else {
+                        setCart(0);
                     }
                 } else{
                     const cartData = getLocalStorageItem("cart_local");

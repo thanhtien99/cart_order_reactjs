@@ -7,6 +7,8 @@ import Profile from "./profile";
 import PrivateRouter from "../protecting_router/private_router";
 import UnPrivateRouter from "../protecting_router/unprivate_router";
 import Cart from "./cart/cart";
+import Order from "./cart/order";
+import ProductDetail from "./product/product_detail";
 
 function PathURL(props) {
   return (
@@ -37,6 +39,8 @@ function PathURL(props) {
         }
       />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/order" element={<Order />} />
+      <Route path="/product/:id" element={<ProductDetail />} />
     </Routes>
   );
 }

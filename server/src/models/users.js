@@ -36,4 +36,4 @@ Users.methods.comparePassword = function(password, done) {
   });
 };
 
-module.exports = mongoose.model('users', Users);
+module.exports = mongoose.model('User', Users);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { productList } from "../../services/product";
+import { productList} from "../../services/product";
 import styles from "../../static/css/product.module.css";
 import { useAuth } from "../../context/authContext";
 import { addCart, addCartToLocalStorage } from "../../services/cart";
@@ -63,6 +63,10 @@ function ProductList() {
     }
   };
 
+  const handleViewDetails = (product_id) => {
+    navigate(`/product/${product_id}`);
+  };
+
   return (
     <div className="row">
       {products.length > 0 ? (
@@ -73,10 +77,12 @@ function ProductList() {
                 src={product.thumbnail}
                 className={`${styles["image_card_product"]} card-img-top mt-3`}
                 alt="Gaming Laptop"
+                onClick={() => handleViewDetails(product._id)}
               />
               <div className="card-body">
                 <div className="d-flex mb-3">
-                  <p className="mb-0 fw-bold">{product.name}</p>
+                  <p className={`${styles["product_name"]} mb-0`}
+                  onClick={() => handleViewDetails(product._id)}>{product.name}</p>
                 </div>
 
                 <div className="d-flex">
@@ -87,19 +93,6 @@ function ProductList() {
                   <p className="small text-secondary">
                     <s>{formatCurrency(product.original_price)}đ</s>
                   </p>
-                </div>
-
-                <div className="d-flex justify-content-between mb-2">
-                  <p className="text-muted mb-0">
-                    Có sẵn: <span className="fw-bold">{product.quantity}</span>
-                  </p>
-                  <div className="ms-auto text-warning">
-                    <i className="fa fa-star"></i>
-                    <i className="fas fa-star"></i>
-                    <i className="fas fa-star"></i>
-                    <i className="fas fa-star"></i>
-                    <i className="fas fa-star-half-alt"></i>
-                  </div>
                 </div>
 
                 <div className="d-flex">

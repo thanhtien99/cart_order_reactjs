@@ -73,6 +73,7 @@ function Navbar() {
           </a>
           <ul className="dropdown-menu drop_profile" aria-labelledby="navbarDropdown">
             <li><NavLink className="dropdown-item" to="/profile">Hồ sơ cá nhân</NavLink></li>
+            <li><NavLink className="dropdown-item" to="/order">Đơn mua</NavLink></li>
             <li><Link className="dropdown-item" to="/" onClick={onLogout} >Đăng xuất</Link></li>
           </ul>
         </li>

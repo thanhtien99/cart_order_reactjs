@@ -20,4 +20,27 @@ productRouter.get("/", async (req, res) => {
   }
 });
 
+
+//Detail product
+productRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const products = await Product.findById(id);
+    if (!products) {
+      return res.status(404).json({ error: 'Product item not found' });
+    }
+    res.status(200).json({
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: { msgBody: "Error fetching products", msgError: true },
+      error: error.message,
+    });
+  }
+});
+
 module.exports = productRouter;

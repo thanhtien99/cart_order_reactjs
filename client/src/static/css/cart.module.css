@@ -95,3 +95,36 @@
     background-color: transparent;
     color: #2a83e9;
 }
+
+.button-tab-order{
+    border: 1px solid #414141;
+    color: #414141;
+}
+
+.active-tab{
+    border: 1px solid rgb(64, 64, 255);
+    color: rgb(64, 64, 255);
+}
+
+.box_cart_id{
+    padding: 20px 16px 0 16px;
+    text-align: left !important;
+}
+
+.btn_detail_order{
+    background-color: #fff;
+    border: 1px solid #fc7600;
+    color: #fc7600;
+}
+
+.img_product{
+    cursor: pointer;
+}
+
+.product_name{
+    cursor: pointer;
+}
+
+.product_name:hover{
+    color: #2a83e9;
+}
