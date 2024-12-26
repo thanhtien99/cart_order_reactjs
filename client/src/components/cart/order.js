@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router";
 import styles from "../../static/css/cart.module.css";
-import OrderDelivery from "./order_delivering";
+// import OrderDelivery from "./order_delivering";
 import OrderSuccess from "./order_success";
 
 function Order() {
-  const [activeTab, setActiveTab] = useState("delivery");
+  // const [activeTab, setActiveTab] = useState("success");
 
   return (
     <>
@@ -33,7 +33,7 @@ function Order() {
               </NavLink>
               <h4 className="fw-normal mb-0 w-100 fw-bold">Đơn hàng đã mua</h4>
             </div>
-            <div className="col-8 d-flex mb-4">
+            {/* <div className="col-8 d-flex mb-4">
               <button
                 className={`btn me-2 ${styles["button-tab-order"]} ${activeTab === "delivery" ? styles["active-tab"] : ""}`}
                 onClick={() => setActiveTab("delivery")}
@@ -46,9 +46,9 @@ function Order() {
               >
                 Thành công
               </button>
-            </div>
-            {activeTab === "delivery" && <OrderDelivery />}
-            {activeTab === "success" && <OrderSuccess />}
+            </div> */}
+            {/* {activeTab === "delivery" && <OrderDelivery />} */}
+            {<OrderSuccess />}
           </div>
         </div>
       </section>

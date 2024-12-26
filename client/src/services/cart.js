@@ -7,11 +7,7 @@ const addCart = async (user_id, product, quantity = 1) => {
     const cartData = {
       user: user_id,
       product_id: product._id,
-      name: product.name,
-      thumbnail: product.thumbnail,
       quantity: quantity,
-      price: product.price,
-      total_price: product.price * quantity,
     };
     
     const response = await axios.post('/cart/', cartData);
@@ -32,10 +28,10 @@ const updateCart = async (cart_id, quantity) => {
 };
 
 
-const getCart = async (user, status) => {
+const getCart = async (user) => {
   try {
     const response = await axios.get('/cart', {
-      params: { user: user._id, status }
+      params: { user: user._id }
     });
     return response.data; 
   } catch (error) {
@@ -55,6 +51,7 @@ const deleteCart = async (cart) => {
   }
 };
 
+// LocalStore
 const addCartToSession = async (product, quantity = 1) => {
   try {
       const cartData = getSessionItem("cart_session") || [];
@@ -117,4 +114,30 @@ const addCartToLocalStorage = async (product, quantity = 1) => {
   }
 };
 
-export { addCart, updateCart, getCart, deleteCart, addCartToSession, addCartToLocalStorage };
+// Order
+const addOrder = async (user_id) => {
+  try {
+    const cartData = {
+      user: user_id,
+    };
+    
+    const response = await axios.post('/cart/order', cartData);
+    return response.data; 
+  } catch (error) {
+    return error;
+  }
+};
+
+const getOrder = async (user) => {
+  try {
+    const response = await axios.get('/cart/order', {
+      params: { user: user._id }
+    });
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching cart count:", error);
+    return { error: error.response?.data?.error || "Unknown error" };
+  }
+};
+
+export { addCart, updateCart, getCart, deleteCart, addCartToSession, addCartToLocalStorage, addOrder, getOrder };

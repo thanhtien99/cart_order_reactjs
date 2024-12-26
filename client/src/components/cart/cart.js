@@ -3,7 +3,7 @@ import { NavLink } from "react-router";
 import styles from "../../static/css/cart.module.css";
 import { useAuth } from "../../context/authContext";
 import { useCartContext } from "../../context/addCart";
-import { getCart, updateCart, deleteCart } from "../../services/cart";
+import { getCart, updateCart, deleteCart, addOrder } from "../../services/cart";
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -11,6 +11,7 @@ import {
 } from "../../utils/localStorage";
 import { formatCurrency } from "../../utils/fomat";
 import { useNavigate } from "react-router";
+import { notifySuccess, notifyError } from '../../utils/toastify';
 
 function Cart() {
   const [cartList, setCartList] = useState([]);
@@ -22,7 +23,7 @@ function Cart() {
     const fetchCarts = async () => {
       try {
         if (isAuthenticated) {
-          const response = await getCart(user, "in_cart");
+          const response = await getCart(user);
           setCartList(response.data);
         } else {
           const response = getLocalStorageItem("cart_local");
@@ -41,20 +42,16 @@ function Cart() {
       try {
         await updateCart(cartId, newQuantity);
         setCartList((prevCartList) => {
-          const items = prevCartList.cart_items || [];
-          return {
-            ...prevCartList,
-            cart_items: items.map((cart) => {
-              if (cart._id === cartId) {
-                cart.quantity = newQuantity;
-                cart.total_price = cart.price * newQuantity;
-              }
-              return cart;
-            }),
-          };
+          return prevCartList.map((cart) => {
+            if (cart._id === cartId) {
+              cart.quantity = newQuantity;
+              cart.total_price = cart.product.price * newQuantity;
+            }
+            return cart;
+          });
         });
-        const cart_items = cartList.cart_items || [];
-        const currentItem = cart_items.find((c) => c._id === cartId);
+
+        const currentItem = cartList.find((c) => c._id === cartId);
         setCart((prev) => prev + (newQuantity - (currentItem?.quantity || 0)));
       } catch (error) {
         console.error("Error updating cart quantity:", error);
@@ -99,25 +96,20 @@ function Cart() {
       try {
         await deleteCart(cart);
         setCartList((prevCartList) => {
-          if (!prevCartList || !Array.isArray(prevCartList.cart_items)) {
-            console.error(
-              "prevCartList.cart_items invalid:",
-              prevCartList
-            );
+          if (!prevCartList || !Array.isArray(prevCartList)) {
+            console.error("prevCartList invalid:", prevCartList);
             return prevCartList;
           }
-          const updatedCartItems = prevCartList.cart_items.filter(
-            (item) => item._id !== cart._id
-          );
-          return { ...prevCartList, cart_items: updatedCartItems };
+          const updatedCartItems = prevCartList.filter((item) => item._id !== cart._id);
+  
+          return updatedCartItems;
         });
         setCart((prev) => prev - cart.quantity);
 
         // close the modal
         const modalElement = document.getElementById(`deleteModal-${cart._id}`);
-        const modal = new window.bootstrap.Modal(modalElement);
         const backdrop = document.querySelector(".modal-backdrop");
-        modal.hide();
+        modalElement.classList.remove("show")
         if (backdrop) {
           backdrop.remove();
           document.body.style.overflow = "";
@@ -148,9 +140,8 @@ function Cart() {
         const modalElement = document.getElementById(
           `deleteModal-${cart.product.id}`
         );
-        const modal = new window.bootstrap.Modal(modalElement);
         const backdrop = document.querySelector(".modal-backdrop");
-        modal.hide();
+        modalElement.classList.remove("show");
         if (backdrop) {
           backdrop.remove();
           document.body.style.overflow = "";
@@ -165,13 +156,32 @@ function Cart() {
     navigate(`/product/${product_id}`);
   };
 
+  const handleAddOrder = async (user) => {
+    try {
+      await addOrder(user._id);
+      setCart(0);
+      notifySuccess("Cart added successfully");
+      navigate(`/order`);
+      // close the modal
+      const modalElement = document.getElementById("orderModal");
+      const backdrop = document.querySelector(".modal-backdrop");
+      modalElement.classList.remove("show");
+      if (backdrop) {
+        backdrop.remove();
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+        document.body.classList.remove("modal-open");
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      notifyError("Failed to add to cart. Please try again.");
+    }
+  };
+
   return (
     <>
       {isAuthenticated ? (
-        cartList &&
-        cartList.cart_orders &&
-        cartList.cart_items &&
-        cartList.cart_items.length > 0 ? (
+        cartList.length > 0 ? (
           <section className="h-100">
             <div className="container h-100 py-5">
               <div className="row d-flex justify-content-center align-items-center h-100">
@@ -220,31 +230,31 @@ function Cart() {
                     </p>
                   </div>
 
-                  {cartList.cart_items.map((cart) => (
+                  {cartList.map((cart) => (
                     <div className="card rounded-3 mb-4" key={cart._id}>
                       <div className="card-body p-4">
                         <div className="row d-flex align-items-center">
                           <div className="col-md-2 col-lg-2 col-xl-2">
                             <img
-                              src={cart.thumbnail}
+                              src={cart.product.thumbnail}
                               className={`${styles["img_product"]} img-fluid rounded-3`}
                               alt="Product"
-                              onClick={() => handleViewDetails(cart.product)}
+                              onClick={() => handleViewDetails(cart.product._id)}
                             />
                           </div>
                           <div className="col-md-10 col-lg-10 col-xl-10 d-flex justify-content-between">
                             <div className="">
                               <h6
                                 className={`${styles["product_name"]} fw-bold mb-2`}
-                                onClick={() => handleViewDetails(cart.product)}
+                                onClick={() => handleViewDetails(cart.product._id)}
                               >
-                                {cart.name}
+                                {cart.product.name}
                               </h6>
                             </div>
 
                             <div className="text-end">
                               <p className="mb-0 text-danger">
-                                {formatCurrency(cart.price)}đ
+                                {formatCurrency(cart.product.price)}đ
                               </p>
                             </div>
                           </div>
@@ -382,12 +392,11 @@ function Cart() {
                       <span>Tổng tiền:</span>
                       <span>
                         {formatCurrency(
-                          cartList.cart_items.reduce(
+                          cartList.reduce(
                             (total, item) => total + item.total_price,
                             0
                           )
-                        )}
-                        đ
+                        )}đ
                       </span>
                     </p>
                     <hr />
@@ -424,6 +433,7 @@ function Cart() {
                           type="radio"
                           name="flexRadioDefault"
                           id="flexRadioDefault2"
+                          checked
                         />
                         <label
                           className="form-check-label align-items-center text-muted"
@@ -444,10 +454,50 @@ function Cart() {
                       <button
                         type="button"
                         className={`${styles["btn_book_cart"]} btn`}
-                      >
+                        data-bs-toggle="modal"
+                        data-bs-target="#orderModal">
                         Đặt hàng
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Modal */}
+            <div
+              className="modal fade"
+              id="orderModal"
+              tabIndex="-1"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true">
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div className="modal-body fw-bold">
+                    Bạn có chắc muốn mua những sản phẩm này?
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Huỷ
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => handleAddOrder(user)}
+                      >
+                      Đồng ý
+                    </button>
                   </div>
                 </div>
               </div>

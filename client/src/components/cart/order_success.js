@@ -2,74 +2,82 @@ import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import styles from "../../static/css/cart.module.css";
 import { useAuth } from "../../context/authContext";
-import { getCart } from "../../services/cart";
+import { getOrder } from "../../services/cart";
 import { formatCurrency, formatISOToCustom } from "../../utils/fomat";
 
 function OrderSuccess() {
-  const [cartList, setCartList] = useState([]);
+  const [orderList, setOrderList] = useState([]);
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const fetchCarts = async () => {
+    const fetchOrders = async () => {
       try {
         if (isAuthenticated) {
-          const response = await getCart(user, "success");
-          setCartList(response.data);
+          const response = await getOrder(user);
+          const orders = response.data.orders;
+          const orderItems = response.data.order_items;
+
+          const ordersWithItems = orders.map(order => {
+            const itemsForOrder = orderItems.filter(item => item.order.toString() === order._id.toString());
+            return { ...order, items: itemsForOrder };
+          });
+
+          setOrderList(ordersWithItems);
         }
       } catch (error) {
-        console.error("Error fetching carts:", error);
+        console.error("Error fetching orders:", error);
       }
     };
 
-    fetchCarts();
+    fetchOrders();
   }, [isAuthenticated, user]);
 
   return (
     <div className={`${styles["cart_body"]} col-8`}>
-      {cartList &&
-      cartList.cart_orders &&
-      cartList.cart_items &&
-      cartList.cart_items.length > 0 ? (
-        cartList.cart_items.map((cart) => (
-          <div className="card rounded-3 mb-4" key={cart._id}>
+      {orderList && orderList.length > 0 ? (
+        orderList.map((order) => (
+          <div className="card rounded-3 mb-4" key={order._id}>
             <div
               className={`${styles["box_cart_id"]} d-flex justify-content-between`}
             >
               <p className="mb-0">
-                <strong>Đơn hàng:</strong> #{cart._id}
+                <strong>Đơn hàng:</strong> #{order._id}
               </p>
               <p className="fw-bold mb-0">
-                {formatISOToCustom(cart.createdAt)}
+                {formatISOToCustom(order.createdAt)}
               </p>
             </div>
             <hr />
             <div className="card-body p-4">
-              <div className="row d-flex align-items-center">
-                <div className="col-md-2 col-lg-2 col-xl-2">
-                  <img
-                    src={cart.thumbnail}
-                    className="img-fluid rounded-3"
-                    alt="Product"
-                  />
-                </div>
-                <div className="col-md-10 col-lg-10 col-xl-10 d-flex justify-content-between">
-                  <div className="">
-                    <h6 className="fw-bold mb-2">{cart.name}</h6>
-                    <p className="me-2 text-start">Số Lượng: {cart.quantity}</p>
+              {order.items.map((item) => (
+                <>
+                <div className="row d-flex align-items-center" key={item._id}>
+                  <div className="col-md-2 col-lg-2 col-xl-2">
+                    <img
+                      src={item.product.thumbnail}
+                      className="img-fluid rounded-3"
+                      alt="Product"
+                    />
                   </div>
+                  <div className="col-md-10 col-lg-10 col-xl-10 d-flex justify-content-between">
+                    <div className="">
+                      <h6 className="fw-bold mb-2">{item.product.name}</h6>
+                      <p className="me-2 text-start">SL: {item.quantity}</p>
+                    </div>
 
-                  <div className="text-end">
-                    <p className="mb-0 text-danger">
-                      {formatCurrency(cart.price)}đ
-                    </p>
+                    <div className="text-end">
+                      <p className="mb-0">
+                        {formatCurrency(item.bought_price)}đ
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="d-flex justify-content-end">
-                <p>Tổng tiền: {formatCurrency(cart.total_price)}đ</p>
-              </div>
-              <div className="d-flex justify-content-end">
-                <button className={`${styles["btn_detail_order"]} btn`}>
+                 <hr/>
+                 </>
+              ))}
+              <div className="text-end">
+                <h5 className="text-danger">Tổng tiền: {formatCurrency(order.items.reduce((total, item) => total + item.total_price, 0))}đ</h5>
+                <button className={`${styles["btn_detail_order"]} btn mt-2`}>
                   Xem chi tiết
                 </button>
               </div>

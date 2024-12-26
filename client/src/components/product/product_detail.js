@@ -99,9 +99,7 @@ function ProductDetail() {
             <span className="ms-2">4.5 (120 reviews)</span>
           </div>
           <p className="mb-4">
-            Experience premium sound quality and industry-leading noise
-            cancellation with these wireless headphones. Perfect for music
-            lovers and frequent travelers.
+            {product.description}
           </p>
           <div className="d-flex">
             <button
