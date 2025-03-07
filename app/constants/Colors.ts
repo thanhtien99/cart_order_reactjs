@@ -5,12 +5,13 @@
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
+const tintColorOrangeCustom = '#ff4500' ;
 
 export const Colors = {
   light: {
     text: '#11181C',
     background: '#fff',
-    tint: tintColorLight,
+    tint: tintColorOrangeCustom,
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
