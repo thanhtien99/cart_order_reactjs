@@ -10,23 +10,29 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { productList } from "../../services/product";
+import { useRouter } from 'expo-router';
 
 export default function ListProduct() {
   const [search, setSearch] = useState('');
   const [products, setProducts] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchProducts = async () => {
       try {
         const response = await productList();
         setProducts(response.data);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching products:', error);
       }
     };
 
-    fetchUsers();
+    fetchProducts();
   }, []);
+
+  const handleViewDetails = (productId: string) => {
+    router.push(`/product/product_detail/${productId}`)
+  }; 
 
   return (
     <View style={styles.container}>
@@ -34,15 +40,15 @@ export default function ListProduct() {
       <FlatList
       
         data={products}
-        keyExtractor={(item) => item._id} // Ensure unique key
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <View style={styles.productCard}>
+          <TouchableOpacity style={styles.productCard} onPress={() => handleViewDetails(item._id)}>
             <Image source={{ uri: item.thumbnail }} style={styles.productImage} />
             <View style={styles.productInfo}>
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.productPrice}>{item.price.toLocaleString()} đ</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         numColumns={2}
         contentContainerStyle={styles.listContainer}
@@ -91,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     margin: 8,
     borderRadius: 8,
-    padding: 10,
+    padding: 5,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -99,9 +105,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   productImage: {
-    width: 120,
+    width: '100%',
     height: 120,
-    borderRadius: 8,
+    resizeMode: 'cover',
   },
   productInfo: {
     marginTop: 5,

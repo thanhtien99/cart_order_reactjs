@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import ListProduct from '@/components/product/ListProduct';
+import ListProduct from '@/app/product/list_product';
 
 export default function HomeScreen() {
   return (
