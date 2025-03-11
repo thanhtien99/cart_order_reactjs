@@ -157,7 +157,7 @@ export default function AccountScreen() {
 
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
+          <Text style={styles.logoutButtonText}>Đăng xuất</Text>
         </TouchableOpacity>
       </ScrollView>
     );

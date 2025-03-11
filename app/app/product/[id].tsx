@@ -10,7 +10,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { productDetail } from '@/services/product';
 import { useAuth } from '@/context/authContext';
@@ -72,17 +72,20 @@ const ProductDetail = () => {
   }
 
   return (
+    <>
+    {/* Header */}
+    <Stack.Screen options={{ title: ""}} />
+    
     <ScrollView style={styles.container}>
-      {/* Hình ảnh sản phẩm */}
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: product.thumbnail }}
           style={styles.mainImage}
-          resizeMode="cover"
+          resizeMode="contain"
         />
       </View>
 
-      {/* Thông tin sản phẩm */}
+      {/* Info Product */}
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{product.name}</Text>
         <Text style={styles.price}>{formatPrice(product.price)}</Text>
@@ -94,7 +97,7 @@ const ProductDetail = () => {
         <Text style={styles.sectionTitle}>Mô tả sản phẩm</Text>
         <Text style={styles.description}>{product.description}</Text>
 
-        {/* Chọn số lượng */}
+        {/* Quanity */}
         <View style={styles.quantityContainer}>
           <Text style={styles.sectionTitle}>Số lượng</Text>
           <View style={styles.quantitySelector}>
@@ -108,72 +111,82 @@ const ProductDetail = () => {
           </View>
         </View>
 
-        {/* Nút Thêm vào giỏ hàng */}
-        <TouchableOpacity style={styles.addToCartButton}>
-          <Text style={styles.addToCartText}>Thêm vào giỏ hàng</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.addToCartButton}>
+            <Text style={styles.addToCartText}>Thêm vào giỏ hàng</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buyNowButton}>
+            <Text style={styles.addToCartText}>Mua ngay</Text>
+          </TouchableOpacity>
+        </View>
+
+        
       </View>
     </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   imageContainer: {
-    width: width,
-    backgroundColor: '#fff',
+    width: "100%",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   mainImage: {
-    width: width,
-    height: width,
+    width: "100%", 
+    height: width * 0.9,
+    borderRadius: 10,
+    aspectRatio: 1,
   },
   infoContainer: {
     padding: 15,
   },
   name: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   price: {
     fontSize: 24,
-    fontWeight: '700',
-    color: '#ff4500',
+    fontWeight: "700",
+    color: "#ff4500",
     marginBottom: 5,
   },
   originalPrice: {
     marginBottom: 15,
   },
   priceLabel: {
-    color: '#666',
+    color: "#666",
   },
   strikethrough: {
-    textDecorationLine: 'line-through',
-    color: '#666',
+    textDecorationLine: "line-through",
+    color: "#666",
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 10,
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     lineHeight: 20,
     marginBottom: 20,
   },
@@ -181,12 +194,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   quantitySelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   quantityButton: {
     padding: 10,
@@ -194,19 +207,34 @@ const styles = StyleSheet.create({
   quantity: {
     paddingHorizontal: 20,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
   addToCartButton: {
-    backgroundColor: '#ff4500',
+    flex: 1,
+    backgroundColor: "#ff4500",
     paddingVertical: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
+    marginRight: 10,
+  },
+  buyNowButton: {
+    flex: 1,
+    backgroundColor: "#007BFF",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
   },
   addToCartText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
+
 
 export default ProductDetail;

@@ -1,7 +1,6 @@
 import React, { useContext, createContext, useEffect, useState } from "react";
 import { useAuth } from "../context/authContext";
 import { getCart } from "../services/cart";
-import { getLocalStorageItem } from "../utils/localStorage";
 
 export const AddCartContext = createContext();
 
@@ -22,13 +21,13 @@ const AddCartProvider = ({children}) => {
                         setCart(0); 
                     }
                 } else{
-                    const cartData = getLocalStorageItem("cart_local");
-                    if(cartData){
-                        const totalQuantity = cartData.reduce((acc, item) => acc + item.quantity, 0);
-                        setCart(totalQuantity);
-                    } else{
-                        setCart(0)
-                    }
+                    // const cartData = getLocalStorageItem("cart_local");
+                    // if(cartData){
+                    //     const totalQuantity = cartData.reduce((acc, item) => acc + item.quantity, 0);
+                    //     setCart(totalQuantity);
+                    // } else{
+                    //     setCart(0)
+                    // }
                     
                 }
             } catch (error) {

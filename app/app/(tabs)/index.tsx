@@ -1,9 +1,16 @@
 import React from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ListProduct from '@/app/product/list_product';
+import { useRouter } from "expo-router";
+import { useAuth } from '@/context/authContext';
+import { useCartContext } from '@/context/addCart';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
+  const { cart } = useCartContext();
+
   return (
     <View style={styles.container}>
       {/* Thanh tìm kiếm + Icon giỏ hàng */}
@@ -16,8 +23,19 @@ export default function HomeScreen() {
             placeholderTextColor="#888"
           />
         </View>
-        <TouchableOpacity style={styles.cartButton}>
+        <TouchableOpacity style={styles.cartButton} onPress={() => router.push("/cart/cart_order")}>
           <Ionicons name="cart-outline" size={28} color="#fff" />
+          {cart > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{cart}</Text>
+            </View>
+          )}
+          { cart ? (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{cart}</Text>
+            </View>
+          ) : <></>
+          }
         </TouchableOpacity>
       </View>
 
@@ -31,7 +49,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 50, // Tránh bị che bởi thanh trạng thái
+    paddingTop: 50,
   },
   header: {
     flexDirection: 'row',
@@ -60,5 +78,21 @@ const styles = StyleSheet.create({
   cartButton: {
     marginLeft: 10,
     padding: 5,
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'red',
+    fontSize: 12,
+    fontWeight: "bold"
   },
 });

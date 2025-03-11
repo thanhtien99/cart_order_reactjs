@@ -31,12 +31,11 @@ export default function ListProduct() {
   }, []);
 
   const handleViewDetails = (productId: string) => {
-    router.push(`/product/product_detail/${productId}`)
+    router.push({pathname: '/product/[id]', params: { id: productId }});
   }; 
 
   return (
     <View style={styles.container}>
-      {/* Danh sách sản phẩm */}
       <FlatList
       
         data={products}
@@ -46,7 +45,8 @@ export default function ListProduct() {
             <Image source={{ uri: item.thumbnail }} style={styles.productImage} />
             <View style={styles.productInfo}>
               <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productPrice}>{item.price.toLocaleString()} đ</Text>
+              <Text style={styles.productPrice}>{item.price.toLocaleString()}đ</Text>
+              <Text style={styles.originalPrice}>{item.original_price.toLocaleString()}đ</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -122,6 +122,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#ff5a5f',
     marginTop: 3,
+  },
+  originalPrice: { 
+    textDecorationLine: "line-through", 
+    color: "#999", 
+    fontSize: 12 
   },
 });
 
