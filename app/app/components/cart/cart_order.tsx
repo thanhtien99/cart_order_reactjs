@@ -15,6 +15,7 @@ import { useCartContext } from "@/context/addCart";
 import { getCart, updateCart, deleteCart } from "@/services/cart";
 import { socket } from "@/app/socket";
 import { notifySuccess, notifyError } from '@/utils/toastify' ;
+import { getAsyncStorageItem, setAsyncStorageItem, removeCartItemAsyncStorage } from "@/utils/asyncStorage";
 
 const Cart = () => {
   const [cartList, setCartList] = useState([]);
@@ -29,8 +30,8 @@ const Cart = () => {
           const response = await getCart(user);
           setCartList(response.data);
         } else {
-          // const response = getLocalStorageItem("cart_local");
-          // setCartList(response || []);
+          const response = await getAsyncStorageItem("cart_local");
+          setCartList(response || []);
         }
       } catch (error) {
         console.error("Error fetching carts:", error);
@@ -59,7 +60,6 @@ const Cart = () => {
               : cart
           )
         );
-        
 
         const updatedTotalQuantity = cartList.reduce(
           (acc, item) => acc + (item._id === cartId ? newQuantity : item.quantity),
@@ -70,21 +70,18 @@ const Cart = () => {
         console.error("Error updating cart quantity:", error);
       }
     } else {
-      // const localCart = [...cartList];
-      // const cartIndex = localCart.findIndex(
-      //   (item) => item.product.id === cartId
-      // );
-      // if (cartIndex > -1) {
-      //   localCart[cartIndex].quantity = newQuantity;
-      //   localCart[cartIndex].total_price =
-      //     localCart[cartIndex].product.price * newQuantity;
-      //   setLocalStorageItem("cart_local", localCart);
-      //   const totalQuantity = localCart.reduce(
-      //     (acc, item) => acc + item.quantity,
-      //     0
-      //   );
-      //   setCart(totalQuantity);
-      // }
+      const localCart = [...cartList];
+      const cartIndex = localCart.findIndex((item) => item.product.id === cartId);
+
+      if (cartIndex > -1) {
+        localCart[cartIndex].quantity = newQuantity;
+        localCart[cartIndex].total_price = localCart[cartIndex].product.price * newQuantity;
+
+        await setAsyncStorageItem("cart_local", localCart);
+
+        const totalQuantity = localCart.reduce((acc, item) => acc + item.quantity, 0);
+        setCart(totalQuantity);
+      }
     }
   };
 
@@ -123,15 +120,28 @@ const Cart = () => {
                   return updatedCartItems;
                 });
                 setCart((prev: any) => prev - cart.quantity);
-                notifySuccess("Xoá thành công khỏi giỏ hàng");
               } else {
-                // const updatedCart = cartList.filter((item) => item.product.id !== cart.product.id);
-                // setCartList(updatedCart);
-                // setCart(updatedCart.reduce((acc, item) => acc + item.quantity, 0));
+                const localCart = [...cartList];
+                const cartIndex = localCart.findIndex(
+                  (item) => item.product.id === cart.product.id
+                );
+                if (cartIndex > -1) {
+                  await removeCartItemAsyncStorage(cart.product.id);
+                  const updatedCart = localCart.filter(
+                    (item) => item.product.id !== cart.product.id
+                  );
+                  const totalQuantity = updatedCart.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                  );
+                  setCartList(updatedCart);
+                  setCart(totalQuantity);
+                }
               }
+              notifySuccess("Xoá thành công khỏi giỏ hàng");
             } catch (error) {
               console.error("Error removing item:", error);
-              notifySuccess("Xoá không thành công, hãy thử lại");
+              notifyError("Xoá không thành công, hãy thử lại");
             }
           },
         },
@@ -169,13 +179,28 @@ const Cart = () => {
 
               {/* Chọn số lượng */}
               <View style={styles.quantityContainer}>
-                <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item._id, item.quantity)}>
-                  <AntDesign name="minus" size={20} color="#333" />
-                </TouchableOpacity>
-                <Text style={styles.quantity}>{item.quantity}</Text>
-                <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item._id, item.quantity)}>
-                  <AntDesign name="plus" size={20} color="#333" />
-                </TouchableOpacity>
+                {
+                  isAuthenticated ? 
+                  <>
+                    <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item._id, item.quantity)}>
+                      <AntDesign name="minus" size={20} color="#333" />
+                    </TouchableOpacity>
+                    <Text style={styles.quantity}>{item.quantity}</Text>
+                    <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item._id, item.quantity)}>
+                      <AntDesign name="plus" size={20} color="#333" />
+                    </TouchableOpacity>
+                  </> : 
+                  <>
+                    <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item.product.id, item.quantity)}>
+                      <AntDesign name="minus" size={20} color="#333" />
+                    </TouchableOpacity>
+                    <Text style={styles.quantity}>{item.quantity}</Text>
+                    <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item.product.id, item.quantity)}>
+                      <AntDesign name="plus" size={20} color="#333" />
+                    </TouchableOpacity>
+                  </>
+                }
+                
               </View>
             </View>
           </View>

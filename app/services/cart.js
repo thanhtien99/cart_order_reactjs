@@ -1,4 +1,5 @@
 import axios from "../utils/api";
+import { getAsyncStorageItem, setAsyncStorageItem } from "@/utils/asyncStorage";
 
 const addCart = async (user_id, product, quantity = 1) => {
   try {
@@ -75,4 +76,36 @@ const getOrder = async (user) => {
   }
 };
 
-export { addCart, updateCart, getCart, deleteCart, addOrder, getOrder };
+//AsyncStorage
+const addCartToAsyncStorage = async (product, quantity = 1) => {
+  try {
+    const cartData = await getAsyncStorageItem('cart_local') || [];
+    const existingProductIndex = cartData.findIndex(item => item.product.id === product._id);
+    const totalPrice = product.price * quantity;
+
+    if (existingProductIndex !== -1) {
+      cartData[existingProductIndex].quantity += quantity;
+      cartData[existingProductIndex].total_price = cartData[existingProductIndex].quantity * product.price;
+    } else {
+        cartData.push({
+          product: {
+            id: product._id,
+            name: product.name,
+            thumbnail: product.thumbnail,
+            price: product.price,
+          },
+          quantity: quantity,
+          total_price: totalPrice,
+        });
+    }
+
+    await setAsyncStorageItem('cart_local', cartData);
+
+    return cartData;
+  } catch (error) {
+      console.error("Error adding to AsyncStorage:", error);
+      return error;
+  }
+};
+
+export { addCart, updateCart, getCart, deleteCart, addOrder, getOrder, addCartToAsyncStorage };

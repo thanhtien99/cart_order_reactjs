@@ -8,8 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Dimensions,
-  Button
+  Dimensions
 } from 'react-native';
 import Header from '@/app/components/layout/header';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
@@ -17,7 +16,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { productDetail } from '@/services/product';
 import { useAuth } from '@/context/authContext';
 import { useCartContext } from '@/context/addCart';
-import { addCart } from '@/services/cart';
+import { addCart, addCartToAsyncStorage } from '@/services/cart';
 import { notifySuccess, notifyError } from '@/utils/toastify' ;
 
 const { width } = Dimensions.get('window');
@@ -62,7 +61,7 @@ const ProductDetail = () => {
       if (isAuthenticated){
         await addCart(user._id, product, quantity);
       } else{
-        // await addCartToLocalStorage(product, quantity);
+        await addCartToAsyncStorage(product, quantity);
       }
 
       setCart((prevCart: any) => prevCart + quantity);
@@ -79,7 +78,7 @@ const ProductDetail = () => {
       if (isAuthenticated){
         await addCart(user._id, product, quantity);
       } else{
-        // await addCartToLocalStorage(product, quantity);
+        await addCartToAsyncStorage(product, quantity);
       }
       setCart((prevCart: any) => prevCart + quantity);
       router.push("/components/cart/cart_order");
@@ -114,6 +113,9 @@ const ProductDetail = () => {
       <Header />
       <ScrollView style={styles.container}>
         <View style={styles.imageContainer}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <AntDesign name="arrowleft" size={20} color="#fff" />
+          </TouchableOpacity>
           <Image
             source={{ uri: product.thumbnail }}
             style={styles.mainImage}
@@ -286,7 +288,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  
+  backButton: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    zIndex: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    padding: 8,
+    borderRadius: 20,
+  },  
 });
 
 
