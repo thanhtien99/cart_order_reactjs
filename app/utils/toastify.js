@@ -1,19 +1,21 @@
-import { toast } from 'react-toastify';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 // Success Notification
-export const notifySuccess = (msg, opts={}) => {
-    return toast.success(msg, opts);
+export const notifySuccess = (msg) => {
+    return Toast.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: 'Thành công',
+        textBody: msg,
+        autoClose: 1000,
+    });
 };
 
 // Error Notification
-export const notifyError = (msg, opts={}) => {
-    return toast.error(msg, opts);
-};
-
-// Custom Notification
-export const notifyCustom = (msg) => {
-    return toast(<div style={{ color: "blue" }}>{msg}</div>, {
-        position: "top-center",
-        autoClose: 5000,
+export const notifyError = (msg) => {
+    return Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Lỗi',
+        textBody: msg,
+        autoClose: 1000,
     });
 };

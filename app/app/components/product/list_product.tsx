@@ -9,12 +9,20 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { productList } from "../../services/product";
+import { productList } from '@/services/product';
 import { useRouter } from 'expo-router';
+
+interface Product {
+  _id: string;
+  name: string;
+  thumbnail: string;
+  price: number;
+  original_price: number;
+}
 
 export default function ListProduct() {
   const [search, setSearch] = useState('');
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,13 +39,12 @@ export default function ListProduct() {
   }, []);
 
   const handleViewDetails = (productId: string) => {
-    router.push({pathname: '/product/[id]', params: { id: productId }});
+    router.push({pathname: '/components/product/[id]', params: { id: productId }});
   }; 
 
   return (
     <View style={styles.container}>
       <FlatList
-      
         data={products}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
@@ -129,4 +136,3 @@ const styles = StyleSheet.create({
     fontSize: 12 
   },
 });
-

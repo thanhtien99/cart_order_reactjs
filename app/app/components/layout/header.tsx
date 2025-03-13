@@ -1,38 +1,60 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ListProduct from '@/app/components/product/list_product';
-import Header from '@/app/components/layout/header';
 import { useRouter } from "expo-router";
 import { useAuth } from '@/context/authContext';
 import { useCartContext } from '@/context/addCart';
+import { socket } from "@/app/socket";
 
-export default function HomeScreen() {
+export default function Header() {
   const router = useRouter();
   const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
-  const { cart } = useCartContext();
+  const { cart, setCart } = useCartContext();
+
+  //Socket
+  useEffect(() => {
+    if(isAuthenticated){
+      socket.on("update-cart-qty", (cart) => {
+        setCart(cart);
+    });
+    }
+  }, []);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <Header />
-      {/* Danh sách sản phẩm */}
-      <ListProduct />
-    </View>
+    <>
+      {/* Thanh tìm kiếm + Icon giỏ hàng */}
+      <View style={styles.header}>
+          <View style={styles.searchContainer}>
+          <Ionicons name="search-outline" size={20} color="#888" style={styles.searchIcon} />
+          <TextInput
+              style={styles.searchBar}
+              placeholder="Tìm kiếm sản phẩm..."
+              placeholderTextColor="#888"
+          />
+          </View>
+          <TouchableOpacity style={styles.cartButton} onPress={() => router.push("/components/cart/cart_order")}>
+          <Ionicons name="cart-outline" size={28} color="#fff" />
+          { cart ? (
+              <View style={styles.badge}>
+              <Text style={styles.badgeText}>{cart}</Text>
+              </View>
+          ) : <></>
+          }
+          </TouchableOpacity>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
     backgroundColor: '#ff4500',
     paddingVertical: 10,
+    paddingTop: 50,
   },
   searchContainer: {
     flexDirection: 'row',

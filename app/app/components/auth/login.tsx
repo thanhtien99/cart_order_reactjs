@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '@/context/authContext';
 import { login } from '@/services/account';
 
 function Login() {
@@ -48,7 +48,7 @@ function Login() {
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Image
-            source={require('../../assets/shopee-logo.png')}
+            source={require('../../../assets/shopee-logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -72,7 +72,7 @@ function Login() {
               secureTextEntry
             />
 
-            <TouchableOpacity onPress={() => router.push('/auth/forgot_password')}>
+            <TouchableOpacity onPress={() => router.push('/components/auth/forgot_password')}>
               <Text style={styles.forgotPassword}>Quên mật khẩu</Text>
             </TouchableOpacity>
           </View>
@@ -83,7 +83,7 @@ function Login() {
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Bạn chưa có tài khoản? </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/signup')}>
+            <TouchableOpacity onPress={() => router.push('/components/auth/signup')}>
               <Text style={styles.signupLink}>Đăng ký</Text>
             </TouchableOpacity>
           </View>

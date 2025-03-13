@@ -1,21 +1,33 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '@/context/authContext';
 import { logout } from '@/services/account';
 import { Ionicons } from '@expo/vector-icons';
+import { useCartContext } from '@/context/addCart';
+import { socket } from '@/app/socket';
 
 export default function AccountScreen() {
   const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
+  const { cart, setCart } = useCartContext();
   const router = useRouter();
+
+  //Socket
+  useEffect(() => {
+    if(isAuthenticated){
+      socket.on("update-cart-qty", (cart) => {
+        setCart(cart);
+    });
+    }
+  }, []);
 
 
   const handleLogin = () => {
-    router.push('/auth/login' as any);
+    router.push('/components/auth/login' as any);
   };
 
   const handleRegister = () => {
-    router.push('/auth/signup' as any);
+    router.push('/components/auth/signup' as any);
   };
 
   const handleLogout = async () => {
@@ -23,7 +35,7 @@ export default function AccountScreen() {
       await logout();
       setUser(null);
       setIsAuthenticated(false);
-      router.replace('/auth/login');
+      router.replace('/components/auth/login');
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -36,11 +48,14 @@ export default function AccountScreen() {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View style={styles.headerIcons}>
-              <TouchableOpacity style={styles.cartIcon}>
+              <TouchableOpacity style={styles.cartIcon} onPress={() => router.push("/components/cart/cart_order")}>
                 <Ionicons name="cart-outline" size={28} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.messageIcon}>
-                <Ionicons name="chatbubble-outline" size={24} color="#fff" />
+                { cart ? (
+                    <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{cart}</Text>
+                    </View>
+                  ) : <></>
+                }
               </TouchableOpacity>
             </View>
           </View>
@@ -92,8 +107,14 @@ export default function AccountScreen() {
               <TouchableOpacity>
                 <Ionicons name="settings-outline" size={24} color="#fff" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cartIcon}>
+              <TouchableOpacity style={styles.cartIcon} onPress={() => router.push("/components/cart/cart_order")}>
                 <Ionicons name="cart-outline" size={28} color="#fff" />
+                { cart ? (
+                    <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{cart}</Text>
+                    </View>
+                  ) : <></>
+                }
               </TouchableOpacity>
             </View>
           </View>
@@ -301,5 +322,21 @@ const styles = StyleSheet.create({
   },
   messageIcon: {
     marginLeft: 15,
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'red',
+    fontSize: 12,
+    fontWeight: "bold"
   },
 });

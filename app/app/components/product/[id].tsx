@@ -9,11 +9,16 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Button
 } from 'react-native';
+import Header from '@/app/components/layout/header';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { productDetail } from '@/services/product';
 import { useAuth } from '@/context/authContext';
+import { useCartContext } from '@/context/addCart';
+import { addCart } from '@/services/cart';
+import { notifySuccess, notifyError } from '@/utils/toastify' ;
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +28,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const { user, isAuthenticated } = useAuth();
+  const { setCart } = useCartContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -51,8 +57,37 @@ const ProductDetail = () => {
     }
   };
 
-  const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN") + "đ";
+  const handleAddToCart = async (product: any, quantity: number) => {
+    try {
+      if (isAuthenticated){
+        await addCart(user._id, product, quantity);
+      } else{
+        // await addCartToLocalStorage(product, quantity);
+      }
+
+      setCart((prevCart: any) => prevCart + quantity);
+      notifySuccess("Sản phẩm đã được thêm vào giỏ hàng!")
+
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      notifyError("Không thêm được vào giỏ hàng. Vui lòng thử lại.")
+    }
+  };
+
+  const handleBuy = async (product: any, quantity: number) => {
+    try {
+      if (isAuthenticated){
+        await addCart(user._id, product, quantity);
+      } else{
+        // await addCartToLocalStorage(product, quantity);
+      }
+      setCart((prevCart: any) => prevCart + quantity);
+      router.push("/components/cart/cart_order");
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      notifyError("Không thêm được vào giỏ hàng. Vui lòng thử lại.")
+    }
   };
 
   if (loading) {
@@ -73,56 +108,57 @@ const ProductDetail = () => {
 
   return (
     <>
-    {/* Header */}
-    <Stack.Screen options={{ title: ""}} />
-    
-    <ScrollView style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: product.thumbnail }}
-          style={styles.mainImage}
-          resizeMode="contain"
-        />
-      </View>
+      <Stack.Screen options={{ headerShown: false}} />
 
-      {/* Info Product */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>{formatPrice(product.price)}</Text>
-        <Text style={styles.originalPrice}>
-          <Text style={styles.priceLabel}>Giá gốc: </Text>
-          <Text style={styles.strikethrough}>{formatPrice(product.original_price)}</Text>
-        </Text>
+      {/* Header */}
+      <Header />
+      <ScrollView style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: product.thumbnail }}
+            style={styles.mainImage}
+            resizeMode="contain"
+          />
+        </View>
 
-        <Text style={styles.sectionTitle}>Mô tả sản phẩm</Text>
-        <Text style={styles.description}>{product.description}</Text>
+        {/* Info Product */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>{product.name}</Text>
+          <Text style={styles.price}>{product.price.toLocaleString()} đ</Text>
+          <Text style={styles.originalPrice}>
+            <Text style={styles.priceLabel}>Giá gốc: </Text>
+            <Text style={styles.strikethrough}>{product.original_price.toLocaleString()} đ</Text>
+          </Text>
 
-        {/* Quanity */}
-        <View style={styles.quantityContainer}>
-          <Text style={styles.sectionTitle}>Số lượng</Text>
-          <View style={styles.quantitySelector}>
-            <TouchableOpacity onPress={handleDecrement} style={styles.quantityButton}>
-              <AntDesign name="minus" size={20} color="#333" />
+          <Text style={styles.sectionTitle}>Mô tả sản phẩm</Text>
+          <Text style={styles.description}>{product.description}</Text>
+
+          {/* Quanity */}
+          <View style={styles.quantityContainer}>
+            <Text style={styles.sectionTitle}>Số lượng</Text>
+            <View style={styles.quantitySelector}>
+              <TouchableOpacity onPress={handleDecrement} style={styles.quantityButton}>
+                <AntDesign name="minus" size={20} color="#333" />
+              </TouchableOpacity>
+              <Text style={styles.quantity}>{quantity}</Text>
+              <TouchableOpacity onPress={handleIncrement} style={styles.quantityButton}>
+                <AntDesign name="plus" size={20} color="#333" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.addToCartButton} onPress={() => handleAddToCart(product, quantity)}>
+              <Text style={styles.addToCartText}>Thêm vào giỏ hàng</Text>
             </TouchableOpacity>
-            <Text style={styles.quantity}>{quantity}</Text>
-            <TouchableOpacity onPress={handleIncrement} style={styles.quantityButton}>
-              <AntDesign name="plus" size={20} color="#333" />
+            <TouchableOpacity style={styles.buyNowButton} onPress={() => handleBuy(product, quantity)}>
+              <Text style={styles.addToCartText}>Mua ngay</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.addToCartButton}>
-            <Text style={styles.addToCartText}>Thêm vào giỏ hàng</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buyNowButton}>
-            <Text style={styles.addToCartText}>Mua ngay</Text>
-          </TouchableOpacity>
+          
         </View>
-
-        
-      </View>
-    </ScrollView>
+      </ScrollView>
     </>
   );
 };
@@ -234,6 +270,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  successMessage: {
+    position: "absolute",
+    top: 50,
+    left: "50%",
+    transform: [{ translateX: -100 }],
+    backgroundColor: "#4CAF50",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    zIndex: 1000,
+  },
+  successText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  
 });
 
 

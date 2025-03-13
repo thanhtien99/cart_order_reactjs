@@ -1,14 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../../context/authContext";
 import { logout } from "../../services/account";
 import { useNavigate } from "react-router-dom";
 import { useCartContext } from "../../context/addCart";
+import { socket } from "../../socket";
 
 function Navbar() {
   const navigate = useNavigate();
   const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
-  const { cart } = useCartContext();
+  const { cart, setCart } = useCartContext();
+
+  //Socket
+  useEffect(() => {
+    if(isAuthenticated){
+      socket.on("update-cart-qty", (cart) => {
+        setCart(cart);
+    });
+    }
+  }, []);
 
   const onLogout = async () => {
     try {

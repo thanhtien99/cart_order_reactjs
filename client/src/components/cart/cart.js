@@ -12,11 +12,12 @@ import {
 import { formatCurrency } from "../../utils/fomat";
 import { useNavigate } from "react-router";
 import { notifySuccess, notifyError } from '../../utils/toastify';
+import { socket } from '../../socket';
 
 function Cart() {
   const [cartList, setCartList] = useState([]);
   const { user, isAuthenticated } = useAuth();
-  const { setCart } = useCartContext();
+  const { cart, setCart } = useCartContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,6 +37,15 @@ function Cart() {
 
     fetchCarts();
   }, [isAuthenticated, user]);
+
+  //Socket
+  useEffect(() => {
+    if(isAuthenticated){
+      if(cart > 0){
+        socket.emit('add-to-cart', cart)
+      }
+    }
+  }, [cart]);
 
   const handleQuantityChange = async (cartId, newQuantity) => {
     if (isAuthenticated) {

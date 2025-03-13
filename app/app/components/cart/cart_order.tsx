@@ -12,12 +12,14 @@ import { AntDesign } from "@expo/vector-icons";
 import { useRouter, Stack } from "expo-router";
 import { useAuth } from "@/context/authContext";
 import { useCartContext } from "@/context/addCart";
-import { getCart, updateCart } from "@/services/cart";
+import { getCart, updateCart, deleteCart } from "@/services/cart";
+import { socket } from "@/app/socket";
+import { notifySuccess, notifyError } from '@/utils/toastify' ;
 
 const Cart = () => {
   const [cartList, setCartList] = useState([]);
   const { user, isAuthenticated } = useAuth();
-  const { setCart } = useCartContext();
+  const { cart, setCart } = useCartContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -38,22 +40,32 @@ const Cart = () => {
     fetchCarts();
   }, [isAuthenticated, user]);
 
+  useEffect(() => {
+    if(isAuthenticated){
+      if(cart > 0){
+        socket.emit('add-to-cart', cart)
+      }
+    }
+  }, [cart]);
+
   const handleQuantityChange = async (cartId: any, newQuantity: number) => {
     if (isAuthenticated) {
       try {
         await updateCart(cartId, newQuantity);
-        setCartList((prevCartList) => {
-          return prevCartList.map((cart) => {
-            if (cart._id === cartId) {
-              cart.quantity = newQuantity;
-              cart.total_price = cart.product.price * newQuantity;
-            }
-            return cart;
-          });
-        });
+        setCartList((prevCartList : any) =>
+          prevCartList.map((cart: any) =>
+            cart._id === cartId
+              ? { ...cart, quantity: newQuantity, total_price: cart.product.price * newQuantity }
+              : cart
+          )
+        );
+        
 
-        const currentItem = cartList.find((c) => c._id === cartId);
-        setCart((prev: any) => prev + (newQuantity - (currentItem?.quantity || 0)));
+        const updatedTotalQuantity = cartList.reduce(
+          (acc, item) => acc + (item._id === cartId ? newQuantity : item.quantity),
+          0
+        );
+        setCart(updatedTotalQuantity);
       } catch (error) {
         console.error("Error updating cart quantity:", error);
       }
@@ -86,66 +98,46 @@ const Cart = () => {
     }
   };
 
-  // const handleRemoveCart = async (cart) => {
-  //   if (isAuthenticated) {
-  //     try {
-  //       await deleteCart(cart);
-  //       setCartList((prevCartList) => {
-  //         if (!prevCartList || !Array.isArray(prevCartList)) {
-  //           console.error("prevCartList invalid:", prevCartList);
-  //           return prevCartList;
-  //         }
-  //         const updatedCartItems = prevCartList.filter((item) => item._id !== cart._id);
-  
-  //         return updatedCartItems;
-  //       });
-  //       setCart((prev) => prev - cart.quantity);
-
-  //       // close the modal
-  //       const modalElement = document.getElementById(`deleteModal-${cart._id}`);
-  //       const backdrop = document.querySelector(".modal-backdrop");
-  //       modalElement.classList.remove("show")
-  //       if (backdrop) {
-  //         backdrop.remove();
-  //         document.body.style.overflow = "";
-  //         document.body.style.paddingRight = "";
-  //         document.body.classList.remove("modal-open");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error updating cart quantity:", error);
-  //     }
-  //   } else {
-  //     const localCart = [...cartList];
-  //     const cartIndex = localCart.findIndex(
-  //       (item) => item.product.id === cart.product.id
-  //     );
-  //     if (cartIndex > -1) {
-  //       removeCartItemLocalStorage(cart.product.id);
-  //       const updatedCart = localCart.filter(
-  //         (item) => item.product.id !== cart.product.id
-  //       );
-  //       const totalQuantity = updatedCart.reduce(
-  //         (acc, item) => acc + item.quantity,
-  //         0
-  //       );
-  //       setCartList(updatedCart);
-  //       setCart(totalQuantity);
-
-  //       // close the modal
-  //       const modalElement = document.getElementById(
-  //         `deleteModal-${cart.product.id}`
-  //       );
-  //       const backdrop = document.querySelector(".modal-backdrop");
-  //       modalElement.classList.remove("show");
-  //       if (backdrop) {
-  //         backdrop.remove();
-  //         document.body.style.overflow = "";
-  //         document.body.style.paddingRight = "";
-  //         document.body.classList.remove("modal-open");
-  //       }
-  //     }
-  //   }
-  // };
+  const handleRemoveItem = async (cart: any) => {
+    Alert.alert(
+      "Xác nhận xoá", 
+      "Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?",
+      [
+        {
+          text: "Huỷ",
+          style: "cancel",
+        },
+        {
+          text: "Xoá",
+          onPress: async () => {
+            try {
+              if (isAuthenticated) {
+                await deleteCart(cart);
+                setCartList((prevCartList) => {
+                  if (!prevCartList || !Array.isArray(prevCartList)) {
+                    console.error("prevCartList invalid:", prevCartList);
+                    return prevCartList;
+                  }
+                  const updatedCartItems = prevCartList.filter((item) => item._id !== cart._id);
+            
+                  return updatedCartItems;
+                });
+                setCart((prev: any) => prev - cart.quantity);
+                notifySuccess("Xoá thành công khỏi giỏ hàng");
+              } else {
+                // const updatedCart = cartList.filter((item) => item.product.id !== cart.product.id);
+                // setCartList(updatedCart);
+                // setCart(updatedCart.reduce((acc, item) => acc + item.quantity, 0));
+              }
+            } catch (error) {
+              console.error("Error removing item:", error);
+              notifySuccess("Xoá không thành công, hãy thử lại");
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <>
@@ -160,12 +152,12 @@ const Cart = () => {
         renderItem={({ item }) => (
           <View style={styles.cartItem}>
             {/* Delete Button */}
-            {/* <TouchableOpacity
+            <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => handleRemoveItem(item.id)}
+              onPress={() => handleRemoveItem(item)}
             >
               <AntDesign name="close" size={18} color="#999" />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <Image source={{ uri: item.product.thumbnail }} style={styles.image} resizeMode="contain"/>
 
@@ -208,7 +200,7 @@ const styles = StyleSheet.create({
   container: { 
     flex: 1, 
     backgroundColor: "#f5f5f5",
-    // padding: 10
+    padding: 8
   },
   cartItem: {
     flexDirection: "row",
@@ -222,28 +214,30 @@ const styles = StyleSheet.create({
   info: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between", // Đẩy quantityContainer ra cuối
+    justifyContent: "space-between",
     alignItems: "center",
   },
   textContainer: {
-    flex: 1, // Chứa thông tin sản phẩm (tên, giá, giá gốc)
-  },
+    flex: 1, 
+    flexShrink: 1,
+    marginRight: 8
+  },  
   name: { fontSize: 16, fontWeight: "bold", color: "#333" },
-  price: { fontSize: 18, fontWeight: "bold", color: "#ff4500", marginTop: 5 },
+  price: { fontSize: 16, fontWeight: "bold", color: "#ff4500", marginTop: 5 },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    width: 100,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    width: 90,
     justifyContent: "space-between",
     borderWidth: 1,
     borderColor: "#ddd",
     alignSelf: "flex-end",
   },
   quantity: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",
     width: 20,
@@ -267,8 +261,8 @@ const styles = StyleSheet.create({
     top: 5,
     right: 5,
     backgroundColor: "rgba(0,0,0,0.05)",
-    padding: 5,
-    borderRadius: 15,
+    padding: 4,
+    borderRadius: 12,
   },
 });
 

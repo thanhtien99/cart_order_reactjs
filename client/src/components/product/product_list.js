@@ -7,11 +7,12 @@ import { notifySuccess, notifyError } from '../../utils/toastify';
 import { useCartContext } from "../../context/addCart";
 import { formatCurrency } from "../../utils/fomat";
 import { useNavigate } from "react-router-dom";
+import { socket } from '../../socket';
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const { user, isAuthenticated } = useAuth();
-  const { setCart } = useCartContext();
+  const { cart, setCart } = useCartContext();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -27,6 +28,15 @@ function ProductList() {
     fetchProducts();
   }, []);
 
+  //Socket
+  useEffect(() => {
+    if(isAuthenticated){
+      if(cart > 0){
+        socket.emit('add-to-cart', cart)
+      }
+    }
+  }, [cart]);
+
   const handleAddToCart = async (product, quantity = 1) => {
     try {
       if (isAuthenticated){
@@ -38,7 +48,6 @@ function ProductList() {
         setCart((prevCart) => prevCart + quantity);
         notifySuccess("Cart added successfully");
       }
-      
     } catch (error) {
       console.error('Error adding to cart:', error);
       notifyError("Failed to add to cart. Please try again.");

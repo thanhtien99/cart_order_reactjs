@@ -16,7 +16,7 @@ export default function ForgotPassword() {
   const handleResetPassword = () => {
     // Handle password reset logic here
     console.log('Reset password for:', email);
-    router.replace('/auth/login');
+    router.replace('/components/auth/login');
   };
 
   return (
@@ -44,7 +44,7 @@ export default function ForgotPassword() {
 
         <TouchableOpacity 
           style={styles.backButton} 
-          onPress={() => router.replace('/auth/login')}
+          onPress={() => router.replace('/components/auth/login')}
         >
           <Text style={styles.backButtonText}>Back to Login</Text>
         </TouchableOpacity>

@@ -8,12 +8,13 @@ import { notifySuccess, notifyError } from '../../utils/toastify';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import { useCartContext } from "../../context/addCart";
+import { socket } from '../../socket';
 
 function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const { user, isAuthenticated } = useAuth();
-  const { setCart } = useCartContext();
+  const { cart, setCart } = useCartContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +30,15 @@ function ProductDetail() {
 
     fetchProduct();
   }, [id]);
+
+  //Socket
+  useEffect(() => {
+    if(isAuthenticated){
+      if(cart > 0){
+        socket.emit('add-to-cart', cart)
+      }
+    }
+  }, [cart]);
 
   const handleAddToCart = async (product, quantity = 1) => {
     try {

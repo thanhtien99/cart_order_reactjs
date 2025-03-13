@@ -9,6 +9,7 @@ import AuthProvider from '@/context/authContext';
 import AddCartProvider from '@/context/addCart';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,12 +34,14 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
         <AddCartProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
+          <AlertNotificationRoot>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="components/auth" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </AlertNotificationRoot>
         </AddCartProvider>
       </AuthProvider>
     </ThemeProvider>

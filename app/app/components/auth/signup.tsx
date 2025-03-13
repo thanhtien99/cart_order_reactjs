@@ -55,7 +55,7 @@ function SignUp() {
           Alert.alert('Success', message.msgBody);
         
           setTimeout(() => {
-            router.replace('/auth/login');
+            router.replace('/components/auth/login');
           }, 1000);
       }
     } catch (error) {
@@ -68,7 +68,7 @@ function SignUp() {
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Image
-            source={require('../../assets/shopee-logo.png')}
+            source={require('../../../assets/shopee-logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -133,7 +133,7 @@ function SignUp() {
 
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Bạn đã có tài khoản? </Text>
-            <TouchableOpacity onPress={() => router.replace('/auth/login')}>
+            <TouchableOpacity onPress={() => router.replace('/components/auth/login')}>
               <Text style={styles.loginLink}>Đăng nhập</Text>
             </TouchableOpacity>
           </View>
