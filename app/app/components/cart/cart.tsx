@@ -277,7 +277,7 @@ const Cart = () => {
               {/* Danh sách sản phẩm trong giỏ hàng */}
               <FlatList
                 data={cartList}
-                keyExtractor={(item) => item._id}
+                keyExtractor={(item) => item.product.id}
                 renderItem={({ item }) => (
                 <View style={styles.cartItem}>
                   {/* Delete Button */}
