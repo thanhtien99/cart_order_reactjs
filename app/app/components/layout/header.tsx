@@ -33,7 +33,7 @@ export default function Header() {
               placeholderTextColor="#888"
           />
           </View>
-          <TouchableOpacity style={styles.cartButton} onPress={() => router.push("/components/cart/cart_order")}>
+          <TouchableOpacity style={styles.cartButton} onPress={() => router.push("/components/cart/cart")}>
           <Ionicons name="cart-outline" size={28} color="#fff" />
           { cart ? (
               <View style={styles.badge}>

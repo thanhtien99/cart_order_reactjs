@@ -48,7 +48,7 @@ export default function AccountScreen() {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View style={styles.headerIcons}>
-              <TouchableOpacity style={styles.cartIcon} onPress={() => router.push("/components/cart/cart_order")}>
+              <TouchableOpacity style={styles.cartIcon} onPress={() => router.push("/components/cart/cart")}>
                 <Ionicons name="cart-outline" size={28} color="#fff" />
                 { cart ? (
                     <View style={styles.badge}>
@@ -107,7 +107,7 @@ export default function AccountScreen() {
               <TouchableOpacity>
                 <Ionicons name="settings-outline" size={24} color="#fff" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cartIcon} onPress={() => router.push("/components/cart/cart_order")}>
+              <TouchableOpacity style={styles.cartIcon} onPress={() => router.push("/components/cart/cart")}>
                 <Ionicons name="cart-outline" size={28} color="#fff" />
                 { cart ? (
                     <View style={styles.badge}>
@@ -157,6 +157,12 @@ export default function AccountScreen() {
 
         {/* Menu Items */}
         <View style={styles.menuSection}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/components/cart/order")}>
+            <Ionicons name="bag-outline" size={24} color="#666" />
+            <Text style={styles.menuText}>Đơn mua</Text>
+            <Ionicons name="chevron-forward" size={24} color="#666" />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem}>
             <Ionicons name="wallet-outline" size={24} color="#666" />
             <Text style={styles.menuText}>Ví ShopeePay</Text>

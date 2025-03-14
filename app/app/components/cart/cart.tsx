@@ -12,10 +12,11 @@ import { AntDesign } from "@expo/vector-icons";
 import { useRouter, Stack } from "expo-router";
 import { useAuth } from "@/context/authContext";
 import { useCartContext } from "@/context/addCart";
-import { getCart, updateCart, deleteCart } from "@/services/cart";
+import { getCart, updateCart, deleteCart, addOrder } from "@/services/cart";
 import { socket } from "@/app/socket";
 import { notifySuccess, notifyError } from '@/utils/toastify' ;
 import { getAsyncStorageItem, setAsyncStorageItem, removeCartItemAsyncStorage } from "@/utils/asyncStorage";
+import EmptyCart from "./cart_empty";
 
 const Cart = () => {
   const [cartList, setCartList] = useState([]);
@@ -97,7 +98,7 @@ const Cart = () => {
 
   const handleRemoveItem = async (cart: any) => {
     Alert.alert(
-      "Xác nhận xoá", 
+      "Xác nhận", 
       "Bạn có chắc chắn muốn xoá sản phẩm này khỏi giỏ hàng?",
       [
         {
@@ -149,48 +150,161 @@ const Cart = () => {
     );
   };
 
+  const handleViewDetails = (productId: string) => {
+    router.push({pathname: '/components/product/[id]', params: { id: productId }});
+  }; 
+
+  const handleAddOrder = async (user: any) => {
+    if (isAuthenticated) {
+      Alert.alert(
+        "Xác nhận", 
+        "Bạn có chắc chắn muốn mua những sản phẩm này?",
+        [
+          {
+            text: "Huỷ",
+            style: "cancel",
+          },
+          {
+            text: "Mua",
+            onPress: async () => {
+              try {
+                await addOrder(user._id);
+                setCartList([]);
+                setCart(0);
+                notifySuccess("Mua hàng thành công");
+              } catch (error) {
+                console.error('Error adding to cart:', error);
+                notifyError("Mua hàng không thành công. Vui lòng thử lại.");
+              }
+            },
+          },
+        ]
+      );
+    } else {
+      Alert.alert(
+        "Thông báo", 
+        "Bạn cần đăng nhập để mua hàng",
+        [
+          {
+            text: "Huỷ",
+            style: "cancel",
+          },
+          {
+            text: "Đăng nhập",
+            onPress: () => {
+              router.push('/components/auth/login' as any);
+            },
+          },
+        ]
+      );
+    }
+  };
+
   return (
     <>
     {/* Header */}
     <Stack.Screen options={{ title: "Giỏ hàng"}} />
 
     <View style={styles.container}>
-      {/* Danh sách sản phẩm trong giỏ hàng */}
-      <FlatList
-        data={cartList}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.cartItem}>
-            {/* Delete Button */}
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleRemoveItem(item)}
-            >
-              <AntDesign name="close" size={18} color="#999" />
-            </TouchableOpacity>
+      { isAuthenticated ? 
+        <> {/* Login */}
+          { Array.isArray(cartList) && cartList.length > 0 ? 
+            <>
+              {/* Danh sách sản phẩm trong giỏ hàng */}
+              <FlatList
+                data={cartList}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                  <View style={styles.cartItem}>
+                    {/* Delete Button */}
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handleRemoveItem(item)}
+                    >
+                      <AntDesign name="close" size={18} color="#999" />
+                    </TouchableOpacity>
 
-            <Image source={{ uri: item.product.thumbnail }} style={styles.image} resizeMode="contain"/>
+                    <TouchableOpacity onPress={() => handleViewDetails(item.product._id)}>
+                      <Image source={{ uri: item.product.thumbnail }} style={styles.image} resizeMode="contain"/>
+                    </TouchableOpacity>
+                    
+                    <View style={styles.info}>
+                      <View style={styles.textContainer}>
 
-            <View style={styles.info}>
-              <View style={styles.textContainer}>
-                <Text style={styles.name}>{item.product.name}</Text>
-                <Text style={styles.price}>{item.product.price.toLocaleString()}đ</Text>
+                        <TouchableOpacity onPress={() => handleViewDetails(item.product._id)}>
+                          <Text style={styles.name}>{item.product.name}</Text>
+                        </TouchableOpacity>
+              
+                        <Text style={styles.price}>{item.product.price.toLocaleString()}đ</Text>
+                      </View>
+
+                      {/* Chọn số lượng */}
+                      <View style={styles.quantityContainer}>
+                        <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item._id, item.quantity)}>
+                          <AntDesign name="minus" size={20} color="#333" />
+                        </TouchableOpacity>
+                        <Text style={styles.quantity}>{item.quantity}</Text>
+                        <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item._id, item.quantity)}>
+                          <AntDesign name="plus" size={20} color="#333" />
+                        </TouchableOpacity>
+                        
+                      </View>
+                    </View>
+                  </View>
+                )}
+              />
+
+              {/* Thanh tổng tiền & nút mua hàng */}
+              <View style={styles.footer}>
+                <Text style={styles.totalText}>
+                  Tổng tiền: <Text style={styles.totalPrice}> {cartList.reduce((total, item) => total + item.total_price, 0).toLocaleString()}đ</Text>
+                </Text>
+                <TouchableOpacity style={styles.buyButton} onPress={() => handleAddOrder(user)}>
+                  <Text style={styles.buyText}>Mua hàng</Text>
+                </TouchableOpacity>
               </View>
+            </> 
+            : 
+            <> 
+              <EmptyCart />
+            </> 
+          }
+        </>
+        :
+        <> {/* UnLogin */}
+          { Array.isArray(cartList) && cartList.length > 0 ? 
+            <>
+              {/* Danh sách sản phẩm trong giỏ hàng */}
+              <FlatList
+                data={cartList}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                <View style={styles.cartItem}>
+                  {/* Delete Button */}
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleRemoveItem(item)}
+                  >
+                    <AntDesign name="close" size={18} color="#999" />
+                  </TouchableOpacity>
 
-              {/* Chọn số lượng */}
-              <View style={styles.quantityContainer}>
-                {
-                  isAuthenticated ? 
-                  <>
-                    <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item._id, item.quantity)}>
-                      <AntDesign name="minus" size={20} color="#333" />
+                  <TouchableOpacity onPress={() => handleViewDetails(item.product.id)}>
+                    <Image source={{ uri: item.product.thumbnail }} style={styles.image} resizeMode="contain"/>
+                  </TouchableOpacity>
+                  
+                  <View style={styles.info}>
+                    <View style={styles.textContainer}>
+
+                    <TouchableOpacity onPress={() => handleViewDetails(item.product.id)}>
+                      <Text style={styles.name}>{item.product.name}</Text>
                     </TouchableOpacity>
-                    <Text style={styles.quantity}>{item.quantity}</Text>
-                    <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item._id, item.quantity)}>
-                      <AntDesign name="plus" size={20} color="#333" />
-                    </TouchableOpacity>
-                  </> : 
-                  <>
+            
+                      <Text style={styles.price}>{item.product.price.toLocaleString()}đ</Text>
+                    </View>
+
+                    {/* Chọn số lượng */}
+
+                    <View style={styles.quantityContainer}>
                     <TouchableOpacity style={styles.quantityButton} onPress={() => handleDecrement(item.product.id, item.quantity)}>
                       <AntDesign name="minus" size={20} color="#333" />
                     </TouchableOpacity>
@@ -198,24 +312,30 @@ const Cart = () => {
                     <TouchableOpacity style={styles.quantityButton} onPress={() => handleIncrement(item.product.id, item.quantity)}>
                       <AntDesign name="plus" size={20} color="#333" />
                     </TouchableOpacity>
-                  </>
-                }
-                
-              </View>
-            </View>
-          </View>
-        )}
-      />
+                      
+                    </View>
+                  </View>
+                </View>
+                )}
+              />
 
-      {/* Thanh tổng tiền & nút mua hàng */}
-      <View style={styles.footer}>
-        <Text style={styles.totalText}>
-          Tổng tiền: <Text style={styles.totalPrice}> {cartList.reduce((total, item) => total + item.total_price, 0).toLocaleString()}đ</Text>
-        </Text>
-        <TouchableOpacity style={styles.buyButton} onPress={() => Alert.alert("Mua hàng thành công!")}>
-          <Text style={styles.buyText}>Mua hàng</Text>
-        </TouchableOpacity>
-      </View>
+              {/* Thanh tổng tiền & nút mua hàng */}
+              <View style={styles.footer}>
+                <Text style={styles.totalText}>
+                  Tổng tiền: <Text style={styles.totalPrice}> {cartList.reduce((total, item) => total + item.total_price, 0).toLocaleString()}đ</Text>
+                </Text>
+                <TouchableOpacity style={styles.buyButton} onPress={() => handleAddOrder(user)}>
+                  <Text style={styles.buyText}>Mua hàng</Text>
+                </TouchableOpacity>
+              </View>
+            </> 
+            :
+            <>
+              <EmptyCart />
+            </>
+          }
+        </>
+      }
     </View>
     </>
   );

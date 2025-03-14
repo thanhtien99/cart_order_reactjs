@@ -81,7 +81,7 @@ const ProductDetail = () => {
         await addCartToAsyncStorage(product, quantity);
       }
       setCart((prevCart: any) => prevCart + quantity);
-      router.push("/components/cart/cart_order");
+      router.push("/components/cart/cart");
       
     } catch (error) {
       console.error('Error adding to cart:', error);
