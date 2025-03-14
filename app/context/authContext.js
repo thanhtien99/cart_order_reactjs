@@ -1,6 +1,6 @@
 import React, { useContext, createContext, useEffect, useState } from "react";
 import AuthService from "../services/account";
-import { View } from 'react-native';
+import { Text } from 'react-native';
 
 export const AuthContext = createContext();
 
@@ -28,7 +28,7 @@ const AuthProvider = ({children}) => {
     return(
         <>
             {!isLoaded ? (
-                <View>Loading.....</View>
+                <Text>Loading.....</Text>
             ) : (
                 <AuthContext.Provider
                 value={{user, setUser, isAuthenticated, setIsAuthenticated}}>
