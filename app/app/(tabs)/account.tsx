@@ -5,7 +5,7 @@ import { useAuth } from '@/context/authContext';
 import { logout } from '@/services/account';
 import { Ionicons } from '@expo/vector-icons';
 import { useCartContext } from '@/context/addCart';
-import { socket } from '@/app/socket';
+import socket from '@/app/socket';
 
 export default function AccountScreen() {
   const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();

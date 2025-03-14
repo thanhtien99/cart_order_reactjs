@@ -56,7 +56,7 @@ const AuthService = {
                 return { isAuthenticated: false, user: { email: "", username: "" } };
             }
         } catch (err) {
-            console.error("Error during authentication check:", err);
+            // console.error("Error during authentication check:", err);
             return { isAuthenticated: false, user: { email: "", username: "" } };
         }
     }

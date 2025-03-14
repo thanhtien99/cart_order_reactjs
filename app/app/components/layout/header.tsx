@@ -5,7 +5,7 @@ import ListProduct from '@/app/components/product/list_product';
 import { useRouter } from "expo-router";
 import { useAuth } from '@/context/authContext';
 import { useCartContext } from '@/context/addCart';
-import { socket } from "@/app/socket";
+import socket from "@/app/socket";
 
 export default function Header() {
   const router = useRouter();

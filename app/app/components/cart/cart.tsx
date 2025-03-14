@@ -13,7 +13,7 @@ import { useRouter, Stack } from "expo-router";
 import { useAuth } from "@/context/authContext";
 import { useCartContext } from "@/context/addCart";
 import { getCart, updateCart, deleteCart, addOrder } from "@/services/cart";
-import { socket } from "@/app/socket";
+import socket from "@/app/socket";
 import { notifySuccess, notifyError } from '@/utils/toastify' ;
 import { getAsyncStorageItem, setAsyncStorageItem, removeCartItemAsyncStorage } from "@/utils/asyncStorage";
 import EmptyCart from "./cart_empty";
