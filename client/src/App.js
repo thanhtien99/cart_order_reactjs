@@ -30,7 +30,7 @@ function App() {
   return (
     <div className="App">
       <Navbar />
-      <section className="d-flex flex-grow-1 align-items-center justify-content-center flex-column">
+      <section className="d-flex flex-grow-1 align-items-center flex-column">
         <PathURL />
       </section>
       <Footer />

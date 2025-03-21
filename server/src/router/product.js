@@ -5,7 +5,37 @@ const Product = require("../models/product");
 //All list product
 productRouter.get("/", async (req, res) => {
   try {
-    const products = await Product.find().sort({"createdAt":-1});
+    let query = {};
+    let sortOption = { createdAt: -1 };
+
+    if (req.query.category) {
+      const categories = Array.isArray(req.query.category) ? req.query.category : req.query.category.split(",");
+      query.category = { $in: categories };
+    }
+
+    if (req.query.price_range) {
+      const priceRanges = {
+        "below_10": { $lt: 10000000 },           
+        "10_20": { $gte: 10000000, $lte: 20000000 }, 
+        "20_30": { $gte: 20000000, $lte: 30000000 }, 
+        "above_30": { $gt: 30000000 },           
+      };
+
+      query.price = priceRanges[req.query.price_range] || {};
+    }
+
+    if (req.query.sort) {
+      const sortOptions = {
+        "price_asc": { price: 1 }, 
+        "price_desc": { price: -1 },
+        "new_product": { createdAt: -1},
+        "old_product": { createdAt: 1},
+      };
+      sortOption = sortOptions[req.query.sort] || {};
+    }
+
+    const products = await Product.find(query).sort(sortOption);
+
     res.status(200).json({
       success: true,
       data: products,

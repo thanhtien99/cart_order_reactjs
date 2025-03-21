@@ -27,11 +27,41 @@
     font-size: 14px;
 }
 
-.product_name{
+.product_name {
     font-weight: bold;
     cursor: pointer;
+    text-align: start;
+    white-space: nowrap;      
+    overflow: hidden;         
+    text-overflow: ellipsis;  
+    max-width: 100%;        
+    display: block;      
 }
 
 .product_name:hover{
     color: #2a83e9;
+}
+.tab-filter{
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px;
+    
+    margin-bottom: 6px;
+}
+
+.tab-filter-close{
+    background-color: #dedede;
+    border: 1px solid grey;
+    color: #626060;
+}
+
+.tab-filter-choose{
+    background-color: #c7dbf1;
+    color: #4b4bfc;
+}
+
+/* Thêm vào file CSS của bạn */
+.btn-close-blue {
+    filter: invert(39%) sepia(98%) saturate(1748%) hue-rotate(218deg) brightness(98%) contrast(99%);
+    font-size: 12px;
 }

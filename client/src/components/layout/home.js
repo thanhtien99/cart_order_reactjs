@@ -7,8 +7,8 @@ function Home() {
   return (
     <>
       <Carousel />
-      <section className={`${style['select_home']}`}>
-        <div className="container py-5">
+      <section className={`${style['select_home']} container`}>
+        <div className="py-4">
           <ProductList />
         </div>
       </section>
