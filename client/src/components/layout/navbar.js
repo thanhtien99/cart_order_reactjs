@@ -1,15 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from "../../context/authContext";
 import { logout } from "../../services/account";
 import { useNavigate } from "react-router-dom";
 import { useCartContext } from "../../context/addCart";
 import { socket } from "../../socket";
+import { searchProducts } from "../../services/product";
+import { formatCurrency } from "../../utils/fomat";
 
 function Navbar() {
   const navigate = useNavigate();
   const {isAuthenticated, setIsAuthenticated, user, setUser} = useAuth();
   const { cart, setCart } = useCartContext();
+  const [keyword, setKeyword] = useState("");
+  const [suggestions, setSuggestions] = useState({ products: [] });
 
   //Socket
   useEffect(() => {
@@ -30,6 +34,29 @@ function Navbar() {
       console.error("Logout failed:", error);
     }
   };
+
+  const handleSearchChange = async (e) => {
+    const value = e.target.value;
+    setKeyword(value);
+
+    if (value.length > 1) {
+      const result = await searchProducts(value);
+      if (result.success) {
+        setSuggestions(result);
+      }
+    } else {
+      setSuggestions({ products: [] });
+    }
+  };
+
+  const handleSelectSuggestion = (product) => {
+    setKeyword("");
+    setSuggestions({ products: [] });
+    navigate(`/product/${product._id}`);
+  };
+
+  console.log("suggestions", suggestions);
+  
 
   const unauthenticateNavbar = () => {
     return(
@@ -110,7 +137,27 @@ function Navbar() {
                 type="search"
                 placeholder="Bạn tìm gì..."
                 aria-label="Search"
+                value={keyword}
+                onChange={handleSearchChange}
               />
+              {suggestions.products.length > 0 ? (
+                <ul className="suggestions">
+                  {suggestions.products.length > 0 && (
+                    <>
+                      <li className="suggestion-title">Sản phẩm gợi ý</li>
+                      {suggestions.products.map((product) => (
+                        <li key={product._id} className="suggestion-item" onClick={() => handleSelectSuggestion(product)}>
+                          <img src={product.thumbnail} alt={product.name} className="suggestion-img" />
+                          <div className="suggestion-info">
+                            <p className="suggestion-name">{product.name}</p>
+                            <p className="suggestion-price">{formatCurrency(product.price)}đ</p>
+                          </div>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                </ul>
+              ) : null}
             </form>
             {isAuthenticated ? authenticateNavbar() : unauthenticateNavbar()}
           </div>

@@ -71,6 +71,10 @@
   width: calc(100% - 35px);
 }
 
+.input_search:focus{
+  box-shadow: none;
+}
+
 .btn_search{
   background-color: transparent;
   border: 0;
@@ -122,6 +126,64 @@
 .badge_card{
   left: 25px;
   font-size: 10px;
+}
+
+.suggestions {
+  position: absolute;
+  background: white;
+  width: 415px;
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 0px 0px 8px 0px;
+  list-style: none;
+  margin-top: 45px;
+}
+
+.suggestion-title {
+  padding: 8px;
+  background: #f5f5f5;
+  font-size: 14px;
+  text-align: start;
+}
+
+.suggestion-category {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  border-bottom: 1px solid #eee;
+}
+
+.suggestion-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.suggestion-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.suggestion-price {
+  color: red;
+  font-size: 14px;
 }
 
 @media (max-width: 450px) {

@@ -51,6 +51,23 @@ productRouter.get("/", async (req, res) => {
 });
 
 
+//Search
+productRouter.get("/search", async (req, res) => {
+  try {
+    const { keyword } = req.query;
+    if (!keyword) {
+      return res.status(400).json({ success: false, message: "Keyword is required" });
+    }
+
+    const products = await Product.find({ name: { $regex: keyword, $options: "i" } })
+      .limit(5);
+
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching search results" });
+  }
+});
+
 //Detail product
 productRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -78,7 +95,6 @@ productRouter.post("/", async (req, res) => {
   try {
     const { name, thumbnail, price, original_price, description, category } = req.body;
 
-    // Kiểm tra đầu vào
     if (!name || !thumbnail || !price || !original_price || !category) {
       return res.status(400).json({
         success: false,

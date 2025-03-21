@@ -40,4 +40,13 @@ const productDetail = async (product_id) => {
   }
 };
 
-export { productList, productDetail };
+const searchProducts = async (keyword) => {
+  try {
+    const response = await axios.get(`/product/search`, { params: { keyword } });
+    return response.data;
+  } catch (error) {
+    return { success: false, products: [] };
+  }
+};
+
+export { productList, productDetail, searchProducts };
