@@ -55,9 +55,6 @@ function Navbar() {
     navigate(`/product/${product._id}`);
   };
 
-  console.log("suggestions", suggestions);
-  
-
   const unauthenticateNavbar = () => {
     return(
       <ul className="navbar-nav">
