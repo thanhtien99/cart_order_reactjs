@@ -59,7 +59,7 @@ userRouter.post("/login", passport.authenticate("local", { session: false }), (r
   if (req.isAuthenticated()) {
     const { _id, email, username, phone, address } = req.user;
     const token = signToken(_id);
-    res.cookie('access_token', token, { httpOnly: true, sameSite: 'Lax' });
+    res.cookie('access_token', token, { httpOnly: true, sameSite: 'Lax', secure: true });
     return res.status(200).json({
       isAuthenticated: true,
       user: { _id, email, username, phone, address },
