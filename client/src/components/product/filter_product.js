@@ -13,7 +13,7 @@ const FilterProduct = ({
     setfilterPrice(price_range);
   };
 
-  const handleCategoryChange = (category, category_name) => {
+  const handleCategoryChange = (category) => {
     if (category === "all") {
       setfilterCategory([]);
     } else {
@@ -101,7 +101,7 @@ const FilterProduct = ({
                     type="checkbox" 
                     id={category.name} 
                     checked={filterCategory.includes(category._id)} 
-                    onChange={() => handleCategoryChange(category._id, category.name)} 
+                    onChange={() => handleCategoryChange(category._id)} 
                   />
                   <label className="form-check-label" htmlFor={category.name}>{category.name}</label>
                 </div>

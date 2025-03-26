@@ -11,6 +11,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { productList } from '@/services/product';
 import { useRouter } from 'expo-router';
+import FilterProduct from './filter_product';
+import { categoryList } from '@/services/category';
 
 interface Product {
   _id: string;
@@ -20,15 +22,30 @@ interface Product {
   original_price: number;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 export default function ListProduct() {
   const [search, setSearch] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
 
+  // filter & sort
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filterCategory, setfilterCategory] = useState<string[]>([]);
+  const [filterPrice, setfilterPrice] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("");
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await productList();
+        const response = await productList({
+          category: filterCategory, 
+          price_range: filterPrice,
+          sort: sortBy
+        });
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -36,14 +53,37 @@ export default function ListProduct() {
     };
 
     fetchProducts();
-  }, []);
+  }, [filterCategory, filterPrice, sortBy]);
 
   const handleViewDetails = (productId: string) => {
     router.push({pathname: '/components/product/[id]', params: { id: productId }});
   }; 
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoryList();
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error("Error fetching category:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <View style={styles.container}>
+      <FilterProduct 
+        categories={categories}
+        filterCategory={filterCategory} 
+        setfilterCategory={setfilterCategory}
+        filterPrice={filterPrice}
+        setfilterPrice={setfilterPrice}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
+        
+
       <FlatList
         data={products}
         keyExtractor={(item) => item._id}
@@ -100,11 +140,11 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   productCard: {
-    flex: 1,
+    width: '48%',
     backgroundColor: '#fff',
-    margin: 8,
+    margin: '1%',
     borderRadius: 8,
-    padding: 5,
+    padding: 10,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -114,7 +154,7 @@ const styles = StyleSheet.create({
   productImage: {
     width: '100%',
     height: 120,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   productInfo: {
     marginTop: 5,
@@ -134,5 +174,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through", 
     color: "#999", 
     fontSize: 12 
-  },
+  }
 });
